@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = View
+TARGET = ludo
 TEMPLATE = app
 
 
@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         dialog.cpp \
     game.cpp \
     ludo_player.cpp \
+    super_ludo_player.cpp \
     ludo_player_random.cpp
 
 HEADERS  += dialog.h \
     game.h \
     ludo_player.h \
     positions_and_dice.h \
+    super_ludo_player.h \
     ludo_player_random.h
 
 FORMS    += dialog.ui

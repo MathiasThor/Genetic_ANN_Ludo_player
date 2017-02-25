@@ -236,7 +236,7 @@ void Dialog::addHomeField(int x, int y,QBrush brush){
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
 
-    scene->addEllipse(x,y,180,180,blackPen,brush);
+    scene->addRect(x,y,180,180,blackPen,brush);
     scene->addEllipse(x+65 ,y+15 ,50,50,blackPen,whiteBrush);
     scene->addEllipse(x+65 ,y+115,50,50,blackPen,whiteBrush);
     scene->addEllipse(x+15 ,y+65 ,50,50,blackPen,whiteBrush);
