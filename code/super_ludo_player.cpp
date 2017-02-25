@@ -38,7 +38,7 @@ int super_ludo_player::make_decision(){
 }
 
 // TODO Investigate bug --> Something when they are in start position the relative pos does not work?
-// (blue 26 and red 39)
+// (blue 26 and red 39) :(
 bool super_ludo_player::can_kill(int pos){
   if (pos == -1 || pos == 99)
     return false;
