@@ -17,7 +17,7 @@ private:
     bool can_get_on_star(int pos);
     bool can_get_on_globe(int pos);
     bool can_enter_danger_zone(int pos);
-    bool is_brisk_in_safe_zone(int pos);
+    bool is_brick_in_safe_zone(int pos);
 
 public:
     super_ludo_player();
