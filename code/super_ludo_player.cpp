@@ -14,6 +14,10 @@ int super_ludo_player::make_decision(){
       can_get_on_star(pos_start_of_turn[i], dice_roll);
       can_get_on_globe(pos_start_of_turn[i], dice_roll);
       can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll);
+      currently_in_safe_zone(pos_start_of_turn[i]);
+      currently_in_non_danger_zone(pos_start_of_turn[i]);
+      currently_on_globe(pos_start_of_turn[i]);
+      enemy_globe(pos_start_of_turn[i]);
     }
 
     if(dice_roll == 6){
@@ -49,22 +53,40 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){
 
   int num_of_players = 0;
 
-  for (int i = 4; i < pos_start_of_turn.size(); i++) {
-    if ( pos_start_of_turn[i] == (pos+new_dice_roll) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ){
-      if (can_get_on_globe(pos_start_of_turn[i],0) || can_get_on_star(pos_start_of_turn[i],0)) {
-        return false;
+  if (can_get_on_star(pos,new_dice_roll)) {
+    // STAR JUMP KILL
+    int star_jump;
+    if(pos == 5  || pos == 18 ||
+       pos == 31 || pos == 44){
+        star_jump = 6;
+    }
+    else if(pos == 11 || pos == 24 ||
+            pos == 37 || pos == 50){
+        star_jump = 7;
+    }
+    for (int i = 4; i < pos_start_of_turn.size(); i++) {
+      if ( pos_start_of_turn[i] == (pos+new_dice_roll+star_jump) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ){
+        if (can_get_on_globe(pos_start_of_turn[i],0) || can_get_on_star(pos_start_of_turn[i],0)) {
+          return false;
+        }
+        num_of_players++;
       }
-      num_of_players++;
-    } // TODO If star jump kill
+    }
+  }
+  else {
+    // NORMAL KILL
+    for (int i = 4; i < pos_start_of_turn.size(); i++) {
+      if ( pos_start_of_turn[i] == (pos+new_dice_roll) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ){
+        if (can_get_on_globe(pos_start_of_turn[i],0) || can_get_on_star(pos_start_of_turn[i],0)) {
+          return false;
+        }
+        num_of_players++;
+      }
+    }
   }
 
   if (num_of_players == 1) {
-    // std::cout << "CAN KILL: " << dice_roll << std::endl;
-    // std::cout << "POS: " << pos << std::endl;
-    // for (size_t i = 0; i < 4; i++)
-    // std::cout << "POS " << i << ": " << pos_start_of_turn[i] << std::endl;
-    // std::cout << "Press ENTER to exit" << std::endl;
-    // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+    // debug_stop("KILL PLAYER", pos, true);
     return true;
   }
   return false;
@@ -72,55 +94,76 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){
 
 bool super_ludo_player::can_get_home(int pos, int new_dice_roll){
   if ( pos + new_dice_roll == 56 || pos + new_dice_roll == 50 ) {
-    //std::cout << "CAN GET HOME: " << dice_roll << std::endl;
-    //std::cout << "POS: " << pos << std::endl;
-    //std::cout << "Press ENTER to exit" << std::endl;
-    //std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+    //debug_stop("GET HOME", pos, false);
     return true;
   }
   return false;
 }
 
-bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // TODO Should 50 be included?
-  if ( pos + new_dice_roll >= 50 && pos < 50) {
-    // std::cout << "CAN ENTER SAFE: " << dice_roll << std::endl;
-    // std::cout << "POS: " << pos << std::endl;
-    // std::cout << "Press ENTER to exit" << std::endl;
-    // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){
+  if ( pos + new_dice_roll >= 51 && pos < 51) {
+    //debug_stop("ENTER SAFE", pos, false);
     return true;
   }
   return false;
 }
 
-bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // TODO Problem with 39 red = 0: Is also here
-  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos+new_dice_roll))
+// TODO Start position bug affects this
+bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){
+  if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
        pos+new_dice_roll == 44 || pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
        pos+new_dice_roll == 37 || pos+new_dice_roll == 50 ) {
-        //  Check for double players on new star?
-        //  std::cout << "CAN GET ON STAR: " << dice_roll << std::endl;
-        //  std::cout << "POS: " << pos << std::endl;
-        //  std::cout << "Press ENTER to exit" << std::endl;
-        //  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+       //debug_stop("GET ON STAR", pos, false);
        return true;
     }
   return false;
 }
 
+// TODO Start position bug affects this
 bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
-  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos+new_dice_roll))
-    if( pos+new_dice_roll % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) { // TODO ADD TWO PALYERS ON TOP OF EACH OTHER (also, can we stack 3 on top?)
-      //  std::cout << "CAN GET ON GLOBE: " << dice_roll << std::endl;
-      //  std::cout << "POS: " << pos << std::endl;
-      //  std::cout << "Press ENTER to exit" << std::endl;
-      //  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
-       return true;
+  int stack_player_count = 0;
+
+  if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll)){
+    if( pos+new_dice_roll % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) { // TODO TEST: ADD TWO PALYERS ON TOP OF EACH OTHER
+      //debug_stop("GET ON GLOBE", pos, false);
+      return true;
+    } else {
+      if (can_get_on_star(pos,new_dice_roll)) {
+        // STAR JUMP KILL
+        int star_jump;
+        if(pos == 5  || pos == 18 ||
+           pos == 31 || pos == 44){
+            star_jump = 6;
+        }
+        else if(pos == 11 || pos == 24 ||
+                pos == 37 || pos == 50){
+            star_jump = 7;
+        }
+        for (int i = 0; i < 4; i++) {
+          if (pos + new_dice_roll + star_jump == pos_start_of_turn[i])
+            stack_player_count++;
+        }
+      } else {
+        for (int i = 0; i < 4; i++) {
+          if (pos + new_dice_roll == pos_start_of_turn[i])
+            stack_player_count++;
+        }
+      }
+      if (new_dice_roll != 0 && stack_player_count >= 1) {
+        //debug_stop("2X PLAYER(1)", pos, true);
+        return true;
+      } else if (new_dice_roll == 0 && stack_player_count >= 2) {
+        //debug_stop("2X PLAYER(2)", pos, false);
+        return true;
+      }
     }
+  }
   return false;
 }
 
 bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ // TODO TEST - NEED DICE_ROLL INCLUDED
-  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos+new_dice_roll))
+  if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
       for (int j = 1; j < 6; j++) {
         if (pos+new_dice_roll >= 6) {
@@ -128,9 +171,10 @@ bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ /
             return false;
           }
         }
-        else if (false) {
-          // TODO WRAP AROUND CODE
-          return false;
+        else{
+          if (pos_start_of_turn[i] = 52+(pos+new_dice_roll-j)) {
+            return false;
+          }
         }
       }
     }
@@ -145,7 +189,8 @@ bool super_ludo_player::currently_in_non_danger_zone(int pos){ // TODO TEST
 }
 
 bool super_ludo_player::currently_in_safe_zone(int pos){
-  if ( pos >= 51 ) {
+  if ( pos >= 51 && pos != 99 ) {
+    debug_stop("Is in safe", pos, true);
     return true;
   }
   return false;
@@ -158,7 +203,6 @@ bool super_ludo_player::currently_on_globe(int pos){
   return false;
 }
 
-//TODO ADD TWO PLAYER ON SAME SPOT
 bool super_ludo_player::enemy_globe(int pos){
   for (int i = 4; i < pos_start_of_turn.size(); i++) {
     if (can_get_on_globe(pos_start_of_turn[i],0)) {
@@ -171,6 +215,7 @@ bool super_ludo_player::enemy_globe(int pos){
 void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
+    // debug_stop("debug", pos_start_of_turn[1], true);
     int decision = make_decision();
     emit select_piece(decision);
 }
@@ -186,9 +231,23 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
     emit turn_complete(game_complete);
 }
 
-// TODO:
+void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positions){
+ std::cout << "CAN " << action << " - DiceRoll: " << dice_roll << std::endl;
+ if (cout_positions) {
+   for (int i = 0; i < pos_start_of_turn.size(); i++)
+   std::cout << "Pos " << i << ": " << pos_start_of_turn[i] << std::endl;
+ } else
+ std::cout << "Pos: " << pos << std::endl;
+ std::cout << "Press ENTER to continue" << std::endl;
+ std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+}
+
+// TODO's:
 // Will stacked players hit home people from own team?
+// Can we can we stack 3 players
 // Two pieces of the same team counts as a globe and will send the piece that moves to it home.
 // make func: can_survive_move
-// fitness function
+// fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // neural network, to train after my play style
+
+// BUG WHY Nr. CHANGE RELATIVE?

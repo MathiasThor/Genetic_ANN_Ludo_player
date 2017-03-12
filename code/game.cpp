@@ -72,7 +72,7 @@ void game::send_them_home(int index){
 void game::move_start(int fixed_piece){
     if(dice_result == 6 && player_positions[fixed_piece] < 0){
         player_positions[fixed_piece] = color*13; //move me to start
-        send_them_home(color*13); //send pieces home if they are on our start
+        send_them_home(color*13); //send other pieces home if they are on our start
     }
 }
 
@@ -207,17 +207,27 @@ std::vector<int> game::relativePosition(){
         relative_positons.push_back(player_positions[i]);
     }
 
+    // TODO FIND BUG HERE!
     for(size_t i = 0; i < relative_positons.size(); ++i){
-        if(relative_positons[i] == 99 || relative_positons[i] == -1){
+        if(relative_positons[i] == 99 || relative_positons[i] == -1){  // OK
+            std::cout << i << ": rule 1 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]);
-        } else if(relative_positons[i] < modifier) {
+            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+        } else if(relative_positons[i] < modifier) {                   // OK
+            std::cout << i << ": rule 2 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]+52-modifier);
-        } else if(relative_positons[i] > 50) {
+            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+        } else if(relative_positons[i] > 50) {                         // BUG - Works for 0
+            std::cout << i << ": rule 3 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]-color*5-1);
-        } else if(relative_positons[i] > modifier) {
+            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+        } else if(relative_positons[i] >= modifier) {                   // OK
+            std::cout << i << ": rule 4 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]-modifier);
+            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
         }
     }
+    std::cout << "---" << std::endl;
     return std::move(relative_positons);
 }
 

@@ -24,6 +24,8 @@ private:
     bool currently_on_globe(int pos);
     bool enemy_globe(int pos);
 
+    void debug_stop(std::string action, int pos, bool cout_positions);
+
 public:
     super_ludo_player();
 signals:
