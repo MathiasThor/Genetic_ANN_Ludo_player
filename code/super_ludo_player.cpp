@@ -8,10 +8,12 @@ super_ludo_player::super_ludo_player(){
 int super_ludo_player::make_decision(){
 
     for (int i = 0; i < 4; i++) {
-      can_kill(pos_start_of_turn[i]);
-      can_get_home(pos_start_of_turn[i]);
-      can_enter_safe_zone(pos_start_of_turn[i]);
-      can_get_on_star(pos_start_of_turn[i]);
+      can_kill(pos_start_of_turn[i], dice_roll);
+      can_get_home(pos_start_of_turn[i], dice_roll);
+      can_enter_safe_zone(pos_start_of_turn[i], dice_roll);
+      can_get_on_star(pos_start_of_turn[i], dice_roll);
+      can_get_on_globe(pos_start_of_turn[i], dice_roll);
+      can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll);
     }
 
     if(dice_roll == 6){
@@ -41,23 +43,26 @@ int super_ludo_player::make_decision(){
 }
 
 // TODO Investigate bug --> Something when they are in start position the relative pos does not work?
-// (blue 26 and red 39) :(
-bool super_ludo_player::can_kill(int pos){
+bool super_ludo_player::can_kill(int pos, int new_dice_roll){
   if (pos == -1 || pos == 99)
     return false;
 
   int num_of_players = 0;
 
-  for (int i = 4; i < pos_start_of_turn.size(); i++) { //TODO: add if on globe or star
-    if ( pos_start_of_turn[i] == (pos+dice_roll) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ) // TODO USE IF STAR AND IS GLOBE
+  for (int i = 4; i < pos_start_of_turn.size(); i++) {
+    if ( pos_start_of_turn[i] == (pos+new_dice_roll) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ){
+      if (can_get_on_globe(pos_start_of_turn[i],0) || can_get_on_star(pos_start_of_turn[i],0)) {
+        return false;
+      }
       num_of_players++;
+    } // TODO If star jump kill
   }
 
   if (num_of_players == 1) {
     // std::cout << "CAN KILL: " << dice_roll << std::endl;
     // std::cout << "POS: " << pos << std::endl;
     // for (size_t i = 0; i < 4; i++)
-    //   std::cout << "POS " << i << ": " << pos_start_of_turn[i] << std::endl;
+    // std::cout << "POS " << i << ": " << pos_start_of_turn[i] << std::endl;
     // std::cout << "Press ENTER to exit" << std::endl;
     // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
     return true;
@@ -65,8 +70,8 @@ bool super_ludo_player::can_kill(int pos){
   return false;
 }
 
-bool super_ludo_player::can_get_home(int pos){
-  if ( pos + dice_roll == 56 || pos + dice_roll == 50 ) {
+bool super_ludo_player::can_get_home(int pos, int new_dice_roll){
+  if ( pos + new_dice_roll == 56 || pos + new_dice_roll == 50 ) {
     //std::cout << "CAN GET HOME: " << dice_roll << std::endl;
     //std::cout << "POS: " << pos << std::endl;
     //std::cout << "Press ENTER to exit" << std::endl;
@@ -76,8 +81,8 @@ bool super_ludo_player::can_get_home(int pos){
   return false;
 }
 
-bool super_ludo_player::can_enter_safe_zone(int pos){ // TODO Should 50 be included?
-  if ( pos + dice_roll >= 50 && pos < 50) {
+bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // TODO Should 50 be included?
+  if ( pos + new_dice_roll >= 50 && pos < 50) {
     // std::cout << "CAN ENTER SAFE: " << dice_roll << std::endl;
     // std::cout << "POS: " << pos << std::endl;
     // std::cout << "Press ENTER to exit" << std::endl;
@@ -87,36 +92,78 @@ bool super_ludo_player::can_enter_safe_zone(int pos){ // TODO Should 50 be inclu
   return false;
 }
 
-bool super_ludo_player::can_get_on_star(int pos){ // TODO Problem with 39 red = 0: Is also here
-  if ( pos != -1 && pos != 99 )
-    if(pos+dice_roll == 5  || pos+dice_roll == 18 || pos+dice_roll == 31 ||
-       pos+dice_roll == 44 || pos+dice_roll == 11 || pos+dice_roll == 24 ||
-       pos+dice_roll == 37 || pos+dice_roll == 50 ) {
+bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // TODO Problem with 39 red = 0: Is also here
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos+new_dice_roll))
+    if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
+       pos+new_dice_roll == 44 || pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
+       pos+new_dice_roll == 37 || pos+new_dice_roll == 50 ) {
+        //  Check for double players on new star?
         //  std::cout << "CAN GET ON STAR: " << dice_roll << std::endl;
         //  std::cout << "POS: " << pos << std::endl;
         //  std::cout << "Press ENTER to exit" << std::endl;
         //  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
-         return true;
+       return true;
     }
   return false;
 }
 
-bool super_ludo_player::can_get_on_globe(int pos){
-  if ( pos != -1 && pos != 99 )
-    if( index % 13 == 0 || (index - 8) % 13 == 0 ) { // TODO ADD TWO MATES ON TOP OF EACH OTHER (also, can we stack 3 on top?)
-         return true;
+bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos+new_dice_roll))
+    if( pos+new_dice_roll % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) { // TODO ADD TWO PALYERS ON TOP OF EACH OTHER (also, can we stack 3 on top?)
+      //  std::cout << "CAN GET ON GLOBE: " << dice_roll << std::endl;
+      //  std::cout << "POS: " << pos << std::endl;
+      //  std::cout << "Press ENTER to exit" << std::endl;
+      //  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+       return true;
     }
   return false;
 }
 
-bool super_ludo_player::can_enter_danger_zone(int pos){
-  //TODO 6 or less steps after an opponent player
+bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ // TODO TEST - NEED DICE_ROLL INCLUDED
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos+new_dice_roll))
+    for (int i = 4; i < pos_start_of_turn.size(); i++) {
+      for (int j = 1; j < 6; j++) {
+        if (pos+new_dice_roll >= 6) {
+          if (pos_start_of_turn[i] = (pos+new_dice_roll-j)) {
+            return false;
+          }
+        }
+        else if (false) {
+          // TODO WRAP AROUND CODE
+          return false;
+        }
+      }
+    }
+  return true;
+}
+
+bool super_ludo_player::currently_in_non_danger_zone(int pos){ // TODO TEST
+  if (can_enter_non_danger_zone(pos,0)) {
+    return true;
+  }
   return false;
 }
 
-bool super_ludo_player::is_brick_in_safe_zone(int pos){
+bool super_ludo_player::currently_in_safe_zone(int pos){
   if ( pos >= 51 ) {
     return true;
+  }
+  return false;
+}
+
+bool super_ludo_player::currently_on_globe(int pos){
+  if ( can_get_on_globe(pos,0) ) {
+    return true;
+  }
+  return false;
+}
+
+//TODO ADD TWO PLAYER ON SAME SPOT
+bool super_ludo_player::enemy_globe(int pos){
+  for (int i = 4; i < pos_start_of_turn.size(); i++) {
+    if (can_get_on_globe(pos_start_of_turn[i],0)) {
+      return true;
+    }
   }
   return false;
 }
@@ -138,3 +185,10 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
     }
     emit turn_complete(game_complete);
 }
+
+// TODO:
+// Will stacked players hit home people from own team?
+// Two pieces of the same team counts as a globe and will send the piece that moves to it home.
+// make func: can_survive_move
+// fitness function
+// neural network, to train after my play style

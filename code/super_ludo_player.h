@@ -11,13 +11,18 @@ private:
     std::vector<int> pos_end_of_turn;
     int dice_roll;
     int make_decision();
-    bool can_kill(int pos);
-    bool can_get_home(int pos);
-    bool can_enter_safe_zone(int pos);
-    bool can_get_on_star(int pos);
-    bool can_get_on_globe(int pos);
-    bool can_enter_danger_zone(int pos);
-    bool is_brick_in_safe_zone(int pos);
+
+    bool can_kill(int pos, int new_dice_roll);
+    bool can_get_home(int pos, int new_dice_roll);
+    bool can_enter_safe_zone(int pos, int new_dice_roll);
+    bool can_get_on_star(int pos, int new_dice_roll);
+    bool can_get_on_globe(int pos, int new_dice_roll);
+    bool can_enter_non_danger_zone(int pos, int new_dice_roll);
+
+    bool currently_in_safe_zone(int pos);
+    bool currently_in_non_danger_zone(int pos);
+    bool currently_on_globe(int pos);
+    bool enemy_globe(int pos);
 
 public:
     super_ludo_player();
@@ -29,4 +34,4 @@ public slots:
     void post_game_analysis(std::vector<int> relative_pos);
 };
 
-#endif // LUDO_PLAYER_H
+#endif // SUPER_LUDO_PLAYER_H

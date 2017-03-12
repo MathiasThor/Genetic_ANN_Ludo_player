@@ -207,7 +207,6 @@ std::vector<int> game::relativePosition(){
         relative_positons.push_back(player_positions[i]);
     }
 
-
     for(size_t i = 0; i < relative_positons.size(); ++i){
         if(relative_positons[i] == 99 || relative_positons[i] == -1){
             relative_positons[i] = (relative_positons[i]);
