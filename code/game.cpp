@@ -227,7 +227,7 @@ std::vector<int> game::relativePosition(){
             //std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
         }
     }
-    std::cout << "---" << std::endl;
+    //std::cout << "---" << std::endl;
     return std::move(relative_positons);
 }
 

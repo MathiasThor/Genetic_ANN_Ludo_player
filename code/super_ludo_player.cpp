@@ -46,8 +46,8 @@ int super_ludo_player::make_decision(){
     return -1;
 }
 
-bool super_ludo_player::can_kill(int pos, int new_dice_roll){
-  if (pos == -1 || pos == 99)
+bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK - HAVENT SEEN STAR KILL YET
+  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos))
     return false;
 
   int num_of_players = 0;
@@ -85,7 +85,7 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){
   }
 
   if (num_of_players == 1) {
-    // debug_stop("KILL PLAYER", pos, true);
+    debug_stop("KILL PLAYER", pos, true);
     return true;
   }
   return false;
@@ -228,13 +228,13 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
 }
 
 void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positions){
- std::cout << "CAN " << action << " - DiceRoll: " << dice_roll << std::endl;
+ std::cout << "Can " << action << " with DiceRoll: " << dice_roll << std::endl;
+ std::cout << "Current Player pos: " << pos << std::endl;
  if (cout_positions) {
    for (int i = 0; i < pos_start_of_turn.size(); i++) {
      std::cout << "Debug_pos " << i << ": " << pos_start_of_turn[i] << std::endl;
    }
- } else
- std::cout << "Pos: " << pos << std::endl;
+ }
  std::cout << "Press ENTER to continue" << std::endl;
  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
 }
