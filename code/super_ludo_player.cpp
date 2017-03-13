@@ -46,7 +46,6 @@ int super_ludo_player::make_decision(){
     return -1;
 }
 
-// TODO Investigate bug --> Something when they are in start position the relative pos does not work?
 bool super_ludo_player::can_kill(int pos, int new_dice_roll){
   if (pos == -1 || pos == 99)
     return false;
@@ -108,7 +107,6 @@ bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){
   return false;
 }
 
-// TODO Start position bug affects this
 bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){
   if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
@@ -120,13 +118,12 @@ bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){
   return false;
 }
 
-// TODO Start position bug affects this
 bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
   int stack_player_count = 0;
 
   if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll)){
-    if( pos+new_dice_roll % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) { // TODO TEST: ADD TWO PALYERS ON TOP OF EACH OTHER
-      //debug_stop("GET ON GLOBE", pos, false);
+    if( pos+new_dice_roll % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) {
+      //debug_stop("GET ON GLOBE", pos, true);
       return true;
     } else {
       if (can_get_on_star(pos,new_dice_roll)) {
@@ -162,17 +159,17 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
   return false;
 }
 
-bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ // TODO TEST - NEED DICE_ROLL INCLUDED
+bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){
   if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
       for (int j = 1; j < 6; j++) {
         if (pos+new_dice_roll >= 6) {
-          if (pos_start_of_turn[i] = (pos+new_dice_roll-j)) {
+          if (pos_start_of_turn[i] == (pos+new_dice_roll-j)) {
             return false;
           }
         }
         else{
-          if (pos_start_of_turn[i] = 52+(pos+new_dice_roll-j)) {
+          if (pos_start_of_turn[i] == 52+(pos+new_dice_roll-j)) {
             return false;
           }
         }
@@ -181,7 +178,7 @@ bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ /
   return true;
 }
 
-bool super_ludo_player::currently_in_non_danger_zone(int pos){ // TODO TEST
+bool super_ludo_player::currently_in_non_danger_zone(int pos){
   if (can_enter_non_danger_zone(pos,0)) {
     return true;
   }
@@ -190,7 +187,7 @@ bool super_ludo_player::currently_in_non_danger_zone(int pos){ // TODO TEST
 
 bool super_ludo_player::currently_in_safe_zone(int pos){
   if ( pos >= 51 && pos != 99 ) {
-    debug_stop("Is in safe", pos, true);
+    //debug_stop("Is in safe", pos, true);
     return true;
   }
   return false;
@@ -215,7 +212,6 @@ bool super_ludo_player::enemy_globe(int pos){
 void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
-    // debug_stop("debug", pos_start_of_turn[1], true);
     int decision = make_decision();
     emit select_piece(decision);
 }
@@ -234,8 +230,9 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
 void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positions){
  std::cout << "CAN " << action << " - DiceRoll: " << dice_roll << std::endl;
  if (cout_positions) {
-   for (int i = 0; i < pos_start_of_turn.size(); i++)
-   std::cout << "Pos " << i << ": " << pos_start_of_turn[i] << std::endl;
+   for (int i = 0; i < pos_start_of_turn.size(); i++) {
+     std::cout << "Debug_pos " << i << ": " << pos_start_of_turn[i] << std::endl;
+   }
  } else
  std::cout << "Pos: " << pos << std::endl;
  std::cout << "Press ENTER to continue" << std::endl;
@@ -249,5 +246,3 @@ void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positi
 // make func: can_survive_move
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // neural network, to train after my play style
-
-// BUG WHY Nr. CHANGE RELATIVE?

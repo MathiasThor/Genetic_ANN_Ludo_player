@@ -210,21 +210,21 @@ std::vector<int> game::relativePosition(){
     // TODO FIND BUG HERE!
     for(size_t i = 0; i < relative_positons.size(); ++i){
         if(relative_positons[i] == 99 || relative_positons[i] == -1){  // OK
-            std::cout << i << ": rule 1 -- fix: " << relative_positons[i];
+            //std::cout << i << ": rule 1 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]);
-            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+            //std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
         } else if(relative_positons[i] < modifier) {                   // OK
-            std::cout << i << ": rule 2 -- fix: " << relative_positons[i];
+            //std::cout << i << ": rule 2 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]+52-modifier);
-            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
-        } else if(relative_positons[i] > 50) {                         // BUG - Works for 0
-            std::cout << i << ": rule 3 -- fix: " << relative_positons[i];
+            //std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+        } else if(relative_positons[i] > 50) {                         // OK - I think
+            //std::cout << i << ": rule 3 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]-color*5-1);
-            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+            //std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
         } else if(relative_positons[i] >= modifier) {                   // OK
-            std::cout << i << ": rule 4 -- fix: " << relative_positons[i];
+            //std::cout << i << ": rule 4 -- fix: " << relative_positons[i];
             relative_positons[i] = (relative_positons[i]-modifier);
-            std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
+            //std::cout << "-- Rel: "<< relative_positons[i] << std::endl;
         }
     }
     std::cout << "---" << std::endl;
