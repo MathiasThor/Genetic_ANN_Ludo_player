@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     super_ludo_player p3_blue, p4_red;
 
     game g;
-    g.setGameDelay(10); //if you want to see the game, set a delay
+    g.setGameDelay(100); //if you want to see the game, set a delay
 
     //set up for each player
     QObject::connect(&g, SIGNAL(player1_start(positions_and_dice)),&p1_green,SLOT(start_turn(positions_and_dice)));

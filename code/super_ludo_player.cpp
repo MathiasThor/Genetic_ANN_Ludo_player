@@ -18,27 +18,35 @@ int super_ludo_player::make_decision(){
       currently_in_non_danger_zone(pos_start_of_turn[i]);
       currently_on_globe(pos_start_of_turn[i]);
       enemy_globe(pos_start_of_turn[i]);
+
+      if (!can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll) && pos_start_of_turn[i] != -1 && pos_start_of_turn[i] != 99) {
+        debug_stop("DANGY", pos_start_of_turn[i], true);
+      }
     }
 
     if(dice_roll == 6){
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]<0){
+                std::cout << "picked player " << i << std::endl;
                 return i;
             }
         }
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
+                std::cout << "picked player " << i << std::endl;
                 return i;
             }
         }
     } else {
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
+                std::cout << "picked player " << i << std::endl;
                 return i;
             }
         }
         for(int i = 0; i < 4; ++i){ //maybe they are all locked in
             if(pos_start_of_turn[i]<0){
+                std::cout << "picked player " << i << std::endl;
                 return i;
             }
         }
@@ -46,8 +54,8 @@ int super_ludo_player::make_decision(){
     return -1;
 }
 
-bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK - HAVENT SEEN STAR KILL YET
-  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos))
+bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL OK
+  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) && pos+new_dice_roll > 50)
     return false;
 
   int num_of_players = 0;
@@ -55,19 +63,16 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK - HAVENT SEE
   if (can_get_on_star(pos,new_dice_roll)) {
     // STAR JUMP KILL
     int star_jump;
-    if(pos == 5  || pos == 18 ||
-       pos == 31 || pos == 44){
+    if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 ||
+       pos+new_dice_roll == 31 || pos+new_dice_roll == 44){
         star_jump = 6;
     }
-    else if(pos == 11 || pos == 24 ||
-            pos == 37 || pos == 50){
+    else if(pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
+            pos+new_dice_roll == 37 || pos+new_dice_roll == 50){
         star_jump = 7;
     }
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
-      if ( pos_start_of_turn[i] == (pos+new_dice_roll+star_jump) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ){
-        if (can_get_on_globe(pos_start_of_turn[i],0) || can_get_on_star(pos_start_of_turn[i],0)) {
-          return false;
-        }
+      if ( pos_start_of_turn[i] == (pos+new_dice_roll+star_jump) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 && !currently_in_safe_zone(pos_start_of_turn[i])){
         num_of_players++;
       }
     }
@@ -85,13 +90,13 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK - HAVENT SEE
   }
 
   if (num_of_players == 1) {
-    debug_stop("KILL PLAYER", pos, true);
+    //debug_stop("KILL PLAYER", pos, true);
     return true;
   }
   return false;
 }
 
-bool super_ludo_player::can_get_home(int pos, int new_dice_roll){
+bool super_ludo_player::can_get_home(int pos, int new_dice_roll){ // Seems OK (few random plays)
   if ( pos + new_dice_roll == 56 || pos + new_dice_roll == 50 ) {
     //debug_stop("GET HOME", pos, false);
     return true;
@@ -99,7 +104,7 @@ bool super_ludo_player::can_get_home(int pos, int new_dice_roll){
   return false;
 }
 
-bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){
+bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // Seems OK (few random plays)
   if ( pos + new_dice_roll >= 51 && pos < 51) {
     //debug_stop("ENTER SAFE", pos, false);
     return true;
@@ -107,7 +112,7 @@ bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){
   return false;
 }
 
-bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){
+bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // OK
   if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
        pos+new_dice_roll == 44 || pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
@@ -118,23 +123,22 @@ bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){
   return false;
 }
 
-bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
+bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){ // SEE TODO's other home bases + getting killed else ok
   int stack_player_count = 0;
 
-  if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll)){
-    if( pos+new_dice_roll % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) {
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
+    if( (pos+new_dice_roll) % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) {
       //debug_stop("GET ON GLOBE", pos, true);
       return true;
     } else {
       if (can_get_on_star(pos,new_dice_roll)) {
-        // STAR JUMP KILL
         int star_jump;
-        if(pos == 5  || pos == 18 ||
-           pos == 31 || pos == 44){
+        if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 ||
+           pos+new_dice_roll == 31 || pos+new_dice_roll == 44){
             star_jump = 6;
         }
-        else if(pos == 11 || pos == 24 ||
-                pos == 37 || pos == 50){
+        else if(pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
+                pos+new_dice_roll == 37 || pos+new_dice_roll == 50){
             star_jump = 7;
         }
         for (int i = 0; i < 4; i++) {
@@ -148,10 +152,10 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
         }
       }
       if (new_dice_roll != 0 && stack_player_count >= 1) {
-        //debug_stop("2X PLAYER(1)", pos, true);
+        //debug_stop("2 man stack(1)", pos, true);
         return true;
       } else if (new_dice_roll == 0 && stack_player_count >= 2) {
-        //debug_stop("2X PLAYER(2)", pos, false);
+        //debug_stop("2 man stack(2)", pos, false);
         return true;
       }
     }
@@ -159,8 +163,8 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
   return false;
 }
 
-bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){
-  if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
+bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ // TODO STAR JUMP OUT OF DANGER AND "MAYBE" STAR JUMP DANGER?
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos)){
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
       for (int j = 1; j < 6; j++) {
         if (pos+new_dice_roll >= 6) {
@@ -175,7 +179,9 @@ bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){
         }
       }
     }
-  return true;
+    return true;
+  }
+  return false;
 }
 
 bool super_ludo_player::currently_in_non_danger_zone(int pos){
@@ -200,6 +206,7 @@ bool super_ludo_player::currently_on_globe(int pos){
   return false;
 }
 
+// TODO use in can_get_killed
 bool super_ludo_player::enemy_globe(int pos){
   for (int i = 4; i < pos_start_of_turn.size(); i++) {
     if (can_get_on_globe(pos_start_of_turn[i],0)) {
@@ -243,6 +250,10 @@ void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positi
 // Will stacked players hit home people from own team?
 // Can we can we stack 3 players
 // Two pieces of the same team counts as a globe and will send the piece that moves to it home.
-// make func: can_survive_move
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // neural network, to train after my play style
+// Will others home bases count as globes?
+// Should the function be can get on free globe? or should it be like it is right now and then with a function called will get killed ( i think last one )
+// make func: can_survive_move
+// make func: get get out of "jail"
+// CONCIDER REMOVING DANGER ZONE FUNCTIONS

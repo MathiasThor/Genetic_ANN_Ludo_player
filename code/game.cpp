@@ -14,8 +14,9 @@ game::game(){
 void game::reset(){
     game_complete = false;
     turn_complete = true;
-    for(auto i : player_positions){
-        i = -1;
+    player_positions.clear();
+    for(int i = 0; i < 16; ++i){
+         player_positions.push_back(-1);
     }
     color = 3;
 }
@@ -236,7 +237,8 @@ void game::turnComplete(bool win){
     turn_complete = true;
     if(game_complete){
         std::cout << "player: " << color << " won" << std::endl;
-        emit declare_winner(color);
+        //emit declare_winner(color);
+        reset();
     }
 }
 

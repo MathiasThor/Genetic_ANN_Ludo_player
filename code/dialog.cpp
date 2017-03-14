@@ -11,8 +11,8 @@ Dialog::Dialog(QWidget *parent) :
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setBackgroundBrush(QBrush(QColor(240,240,239)));
 
-    diceBG = scene->addRect(0,-150,100,100,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(Qt::green));
-    diceRoll = scene->addSimpleText(QString::number(0),QFont("Courier", 72, QFont::Bold, true));
+    diceBG = scene->addRect(0,-150,100,100,QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(Qt::green));
+    diceRoll = scene->addSimpleText(QString::number(0),QFont("Roboto", 72, QFont::Bold, true));
     diceRoll->setPos(25,-150);
     // Colors
     std::vector<std::pair<QColor,QColor> >base_colors {
@@ -201,8 +201,8 @@ void Dialog::resizeEvent(QResizeEvent *){
 }
 
 void Dialog::get_winner(int color){
-    scene->addRect(0,500,1000,200,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(active_color));
-    QGraphicsSimpleTextItem * win = scene->addSimpleText(QString("Winner is found!"),QFont("Courier", 72, QFont::Bold, true));
+    scene->addRect(0,500,1000,200,QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(active_color));
+    QGraphicsSimpleTextItem * win = scene->addSimpleText(QString("Winner is found!"),QFont("Roboto", 72, QFont::Bold, true));
     win->setPos(50,550);
 }
 
