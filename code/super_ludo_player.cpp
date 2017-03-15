@@ -1,6 +1,9 @@
 #include "super_ludo_player.h"
 #include <random>
 #include <game.h>
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 super_ludo_player::super_ludo_player(){
 }
@@ -19,8 +22,8 @@ int super_ludo_player::make_decision(){
       currently_on_globe(pos_start_of_turn[i]);
       enemy_globe(pos_start_of_turn[i]);
 
-      if (!can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll) && pos_start_of_turn[i] != -1 && pos_start_of_turn[i] != 99) {
-        debug_stop("DANGY", pos_start_of_turn[i], true);
+      if (currently_in_safe_zone(pos_start_of_turn[i])) {
+        debug_stop("CSTARTY", pos_start_of_turn[i], true);
       }
     }
 
@@ -54,6 +57,7 @@ int super_ludo_player::make_decision(){
     return -1;
 }
 
+// OK
 bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL OK
   if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) && pos+new_dice_roll > 50)
     return false;
@@ -96,6 +100,7 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
   return false;
 }
 
+// OK
 bool super_ludo_player::can_get_home(int pos, int new_dice_roll){ // Seems OK (few random plays)
   if ( pos + new_dice_roll == 56 || pos + new_dice_roll == 50 ) {
     //debug_stop("GET HOME", pos, false);
@@ -104,6 +109,7 @@ bool super_ludo_player::can_get_home(int pos, int new_dice_roll){ // Seems OK (f
   return false;
 }
 
+// OK
 bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // Seems OK (few random plays)
   if ( pos + new_dice_roll >= 51 && pos < 51) {
     //debug_stop("ENTER SAFE", pos, false);
@@ -112,6 +118,7 @@ bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // Seem
   return false;
 }
 
+// OK
 bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // OK
   if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
@@ -123,11 +130,12 @@ bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // OK
   return false;
 }
 
-bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){ // SEE TODO's other home bases + getting killed else ok
+// OK
+bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){ // TODO ADD FUNCTION CALL TO ENEMY START
   int stack_player_count = 0;
 
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
-    if( (pos+new_dice_roll) % 13 == 0 || (pos+new_dice_roll - 8) % 13 == 0 ) {
+    if( (pos+new_dice_roll - 8) % 13 == 0 ) {
       //debug_stop("GET ON GLOBE", pos, true);
       return true;
     } else {
@@ -163,6 +171,7 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){ // SEE TOD
   return false;
 }
 
+// OK
 bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ // TODO STAR JUMP OUT OF DANGER AND "MAYBE" STAR JUMP DANGER?
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos)){
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
@@ -184,6 +193,7 @@ bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ /
   return false;
 }
 
+// OK
 bool super_ludo_player::currently_in_non_danger_zone(int pos){
   if (can_enter_non_danger_zone(pos,0)) {
     return true;
@@ -191,6 +201,7 @@ bool super_ludo_player::currently_in_non_danger_zone(int pos){
   return false;
 }
 
+// OK
 bool super_ludo_player::currently_in_safe_zone(int pos){
   if ( pos >= 51 && pos != 99 ) {
     //debug_stop("Is in safe", pos, true);
@@ -199,17 +210,55 @@ bool super_ludo_player::currently_in_safe_zone(int pos){
   return false;
 }
 
+// OK
 bool super_ludo_player::currently_on_globe(int pos){
-  if ( can_get_on_globe(pos,0) ) {
+  if ( can_get_on_globe(pos,0) || pos == 0) {
     return true;
   }
   return false;
 }
 
-// TODO use in can_get_killed
+// OK
+bool super_ludo_player::can_get_on_enemy_start(int pos, int new_dice_roll){
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
+    if ((pos+new_dice_roll) % 13 == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// OK
+bool super_ludo_player::currently_on_enemy_start(int pos){
+  if ( can_get_on_enemy_start(pos,0) && pos != 0) {
+    return true;
+  }
+  return false;
+}
+
+// OK
+bool super_ludo_player::can_get_killed(int pos, int new_dice_roll){
+  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) && pos+new_dice_roll > 50)
+    return false;
+
+  if (enemy_globe(pos+new_dice_roll)) {
+    return true;
+  }
+  return false;
+}
+
+//OK
+bool super_ludo_player::can_get_out_of_start(int pos, int new_dice_roll){
+  if (pos == -1 && new_dice_roll == 6) {
+    return true;
+  }
+  return false;
+}
+
+// OK
 bool super_ludo_player::enemy_globe(int pos){
   for (int i = 4; i < pos_start_of_turn.size(); i++) {
-    if (can_get_on_globe(pos_start_of_turn[i],0)) {
+    if (pos == pos_start_of_turn[i] && (currently_on_globe(pos_start_of_turn[i]) || currently_on_enemy_start(pos_start_of_turn[i])) ) {
       return true;
     }
   }
@@ -220,6 +269,7 @@ void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
     int decision = make_decision();
+    record_my_games();
     emit select_piece(decision);
 }
 
@@ -246,14 +296,48 @@ void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positi
  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
 }
 
+int super_ludo_player::record_my_games(){
+  for (int i = 0; i < 4; i++) {
+    std::cout << "Player " << i << " Position: " << pos_start_of_turn[i] << std::endl;
+  }
+  cout << "enter player to move: ";
+  int player_num = 0;
+  cin >> player_num;
+  cout << endl;
+
+  ofstream myfile;
+  myfile.open ("my_playstyle.txt", ios::app);
+
+  myfile <<  can_kill(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_get_home(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_enter_safe_zone(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_get_on_star(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_get_on_globe(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_enter_non_danger_zone(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_get_killed(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_get_out_of_start(pos_start_of_turn[player_num], dice_roll);
+  myfile <<  can_get_on_enemy_start(pos_start_of_turn[player_num], dice_roll);
+
+  myfile <<  currently_on_enemy_start(pos_start_of_turn[player_num]);
+  myfile <<  currently_in_safe_zone(pos_start_of_turn[player_num]);
+  myfile <<  currently_in_non_danger_zone(pos_start_of_turn[player_num]);
+  myfile <<  currently_on_globe(pos_start_of_turn[player_num]);
+
+  // TODO Not needed, consider how this function should work
+  // Also what to do if all players are at home?
+  myfile <<  player_num;
+
+  myfile <<  "\n";
+  myfile.close();
+  return player_num;
+}
+
+
 // TODO's:
-// Will stacked players hit home people from own team?
-// Can we can we stack 3 players
-// Two pieces of the same team counts as a globe and will send the piece that moves to it home.
+// Will stacked players hit home people from own team? NO - SEE "send_them_home"
+// TODO . Is it "i <= pos_start_of_turn.size()" or "i < pos_start_of_turn.size()"
+
+// I SUSPECT A BUG WHEN PLAYERS ARE IN SAFE ZONE
+
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
-// neural network, to train after my play style
-// Will others home bases count as globes?
-// Should the function be can get on free globe? or should it be like it is right now and then with a function called will get killed ( i think last one )
-// make func: can_survive_move
-// make func: get get out of "jail"
-// CONCIDER REMOVING DANGER ZONE FUNCTIONS
+// Neural network, to train after my play style

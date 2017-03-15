@@ -18,12 +18,17 @@ private:
     bool can_get_on_star(int pos, int new_dice_roll);
     bool can_get_on_globe(int pos, int new_dice_roll);
     bool can_enter_non_danger_zone(int pos, int new_dice_roll);
+    bool can_get_killed(int pos, int new_dice_roll);
+    bool can_get_out_of_start(int pos, int new_dice_roll);
+    bool can_get_on_enemy_start(int pos, int new_dice_roll);
 
+    bool currently_on_enemy_start(int pos);
     bool currently_in_safe_zone(int pos);
     bool currently_in_non_danger_zone(int pos);
     bool currently_on_globe(int pos);
     bool enemy_globe(int pos);
 
+    int record_my_games();
     void debug_stop(std::string action, int pos, bool cout_positions);
 
 public:
