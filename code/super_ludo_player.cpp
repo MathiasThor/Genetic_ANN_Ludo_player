@@ -22,7 +22,7 @@ int super_ludo_player::make_decision(){
       currently_on_globe(pos_start_of_turn[i]);
       enemy_globe(pos_start_of_turn[i]);
 
-      if (currently_in_safe_zone(pos_start_of_turn[i])) {
+      if (can_get_on_globe(pos_start_of_turn[i],dice_roll)) {
         debug_stop("CSTARTY", pos_start_of_turn[i], true);
       }
     }
@@ -269,7 +269,7 @@ void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
     int decision = make_decision();
-    record_my_games();
+    //record_my_games();
     emit select_piece(decision);
 }
 

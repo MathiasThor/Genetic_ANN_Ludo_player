@@ -17,9 +17,20 @@ int main(int argc, char *argv[]){
     super_ludo_player p1_green;
     super_ludo_player p2_yellow;
     super_ludo_player p3_blue, p4_red;
-
     game g;
     g.setGameDelay(10); //if you want to see the game, set a delay
+
+    //* Add a GUI <-- remove the '/' to uncomment block
+    Dialog w;
+    QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
+    QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
+    QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
+    QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
+    QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
+    w.show();
+    /*/ //Or don't add the GUI
+    QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
+    //*/
 
     //set up for each player
     QObject::connect(&g, SIGNAL(player1_start(positions_and_dice)),&p1_green,SLOT(start_turn(positions_and_dice)));
@@ -42,18 +53,14 @@ int main(int argc, char *argv[]){
     QObject::connect(&g, SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
     QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
-    //* add a GUI
-    Dialog w;
-    QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
-    QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
-    QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
-    QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner(int)));
-    w.show();
-    //*/
-
+    // for(int i = 0; i < 10000; ++i){
+    //     g.start();
+    //     a.exec();
+    //     g.reset();
+    // }
 
     g.start();
+    a.exec();
 
-
-    return a.exec();
+    return 0;
 }

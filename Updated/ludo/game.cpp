@@ -245,7 +245,6 @@ void game::turnComplete(bool win){
     if(game_complete){
         std::cout << "player: " << color << " won" << std::endl;
         emit declare_winner(color);
-        //reset();
     }
 }
 

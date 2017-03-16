@@ -43,7 +43,8 @@ public slots:
     void update_graphics(std::vector<int> player_positions);
     void get_color(int color);
     void get_dice_result(int dice);
-    void get_winner();
+    void get_winner(void);
+    // void get_winner(int color);
 };
 
 #endif // DIALOG_H

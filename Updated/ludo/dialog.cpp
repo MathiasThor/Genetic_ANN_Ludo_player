@@ -11,8 +11,8 @@ Dialog::Dialog(QWidget *this_parent) :
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setBackgroundBrush(QBrush(QColor(240,240,239)));
 
-    diceBG = scene->addRect(0,-150,100,100,QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(Qt::green));
-    diceRoll = scene->addSimpleText(QString::number(0),QFont("Roboto", 72, QFont::Bold, true));
+    diceBG = scene->addRect(0,-150,100,100,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(Qt::green));
+    diceRoll = scene->addSimpleText(QString::number(0),QFont("Courier", 72, QFont::Bold, true));
     diceRoll->setPos(25,-150);
     // Colors
     std::vector<std::pair<QColor,QColor> >base_colors {
@@ -200,10 +200,10 @@ void Dialog::resizeEvent(QResizeEvent *){
     ui->graphicsView->fitInView(scene->itemsBoundingRect(),Qt::KeepAspectRatio);
 }
 
-void Dialog::get_winner(){
-    //scene->addRect(0,500,1000,200,QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(active_color));
-    //QGraphicsSimpleTextItem * win = scene->addSimpleText(QString("Winner is found!"),QFont("Roboto", 72, QFont::Bold, true));
-    //win->setPos(50,550);
+void Dialog::get_winner() {
+//    scene->addRect(0,500,1000,200,QPen(Qt::black,3,Qt::SolidLine,Qt::RoundCap, Qt::RoundJoin),QBrush(active_color));
+//    QGraphicsSimpleTextItem * win = scene->addSimpleText(QString("Winner is found!"),QFont("Courier", 72, QFont::Bold, true));
+//    win->setPos(50,550);
 }
 
 void Dialog::get_color(int color){
@@ -236,7 +236,7 @@ void Dialog::addHomeField(int dx, int dy,QBrush brush){
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
 
-    scene->addRect(dx,dy,180,180,blackPen,brush);
+    scene->addEllipse(dx,dy,180,180,blackPen,brush);
     scene->addEllipse(dx+65 ,dy+15 ,50,50,blackPen,whiteBrush);
     scene->addEllipse(dx+65 ,dy+115,50,50,blackPen,whiteBrush);
     scene->addEllipse(dx+15 ,dy+65 ,50,50,blackPen,whiteBrush);

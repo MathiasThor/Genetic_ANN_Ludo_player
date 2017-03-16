@@ -26,6 +26,7 @@ private:
     bool currently_in_safe_zone(int pos);
     bool currently_in_non_danger_zone(int pos);
     bool currently_on_globe(int pos);
+
     bool enemy_globe(int pos);
 
     int record_my_games();
