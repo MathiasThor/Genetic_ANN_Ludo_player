@@ -5,7 +5,11 @@
 #include <fstream>
 using namespace std;
 
-super_ludo_player::super_ludo_player(){
+super_ludo_player::super_ludo_player():
+  pos_start_of_turn(16),
+  pos_end_of_turn(16),
+  dice_roll(0)
+{
 }
 
 int super_ludo_player::make_decision(){
@@ -22,9 +26,9 @@ int super_ludo_player::make_decision(){
       currently_on_globe(pos_start_of_turn[i]);
       enemy_globe(pos_start_of_turn[i]);
 
-      if (can_get_on_globe(pos_start_of_turn[i],dice_roll)) {
-        debug_stop("CSTARTY", pos_start_of_turn[i], true);
-      }
+      // if (can_kill(pos_start_of_turn[i],dice_roll)) {
+      //   debug_stop("KILLY", pos_start_of_turn[i], true);
+      // }
     }
 
     if(dice_roll == 6){
@@ -63,10 +67,10 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
     return false;
 
   int num_of_players = 0;
+  int star_jump = 0;
 
   if (can_get_on_star(pos,new_dice_roll)) {
     // STAR JUMP KILL
-    int star_jump;
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 ||
        pos+new_dice_roll == 31 || pos+new_dice_roll == 44){
         star_jump = 6;
@@ -76,7 +80,7 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
         star_jump = 7;
     }
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
-      if ( pos_start_of_turn[i] == (pos+new_dice_roll+star_jump) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 && !currently_in_safe_zone(pos_start_of_turn[i])){
+      if ( pos_start_of_turn[i] == (pos+new_dice_roll+star_jump) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 && !currently_in_safe_zone(pos_start_of_turn[i]) && !currently_on_globe(pos_start_of_turn[i])){
         num_of_players++;
       }
     }
@@ -85,7 +89,7 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
     // NORMAL KILL
     for (int i = 4; i < pos_start_of_turn.size(); i++) {
       if ( pos_start_of_turn[i] == (pos+new_dice_roll) && pos_start_of_turn[i] != 99 && pos_start_of_turn[i] != -1 ){
-        if (can_get_on_globe(pos_start_of_turn[i],0) || can_get_on_star(pos_start_of_turn[i],0)) {
+        if (currently_on_globe(pos_start_of_turn[i]) || can_get_on_star(pos_start_of_turn[i],0) || currently_on_enemy_start(pos_start_of_turn[i])) {
           return false;
         }
         num_of_players++;
@@ -93,8 +97,8 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
     }
   }
 
-  if (num_of_players == 1) {
-    //debug_stop("KILL PLAYER", pos, true);
+  if (num_of_players == 1 && star_jump != 0) {
+    debug_stop("KILL PLAYER", pos, true);
     return true;
   }
   return false;
@@ -131,7 +135,7 @@ bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // OK
 }
 
 // OK
-bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){ // TODO ADD FUNCTION CALL TO ENEMY START
+bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
   int stack_player_count = 0;
 
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
@@ -268,8 +272,7 @@ bool super_ludo_player::enemy_globe(int pos){
 void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
-    int decision = make_decision();
-    //record_my_games();
+    int decision = record_my_games();//make_decision();
     emit select_piece(decision);
 }
 
@@ -300,32 +303,59 @@ int super_ludo_player::record_my_games(){
   for (int i = 0; i < 4; i++) {
     std::cout << "Player " << i << " Position: " << pos_start_of_turn[i] << std::endl;
   }
+  cout << "\n---\n\n";
+
+  if (dice_roll != 6 && pos_start_of_turn[0] == -1 && pos_start_of_turn[1] == -1 && pos_start_of_turn[2] == -1 && pos_start_of_turn[3] == -1) {
+    return -1;
+  }
+
   cout << "enter player to move: ";
   int player_num = 0;
   cin >> player_num;
   cout << endl;
 
   ofstream myfile;
-  myfile.open ("my_playstyle.txt", ios::app);
+  myfile.open ("plays.data", ios::app);
 
-  myfile <<  can_kill(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_get_home(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_enter_safe_zone(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_get_on_star(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_get_on_globe(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_enter_non_danger_zone(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_get_killed(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_get_out_of_start(pos_start_of_turn[player_num], dice_roll);
-  myfile <<  can_get_on_enemy_start(pos_start_of_turn[player_num], dice_roll);
+  for (int i = 0; i < 4; i++) {
+    myfile <<  can_kill(pos_start_of_turn[i], dice_roll) << " ";
+    myfile <<  can_get_home(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_enter_safe_zone(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_get_on_star(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_get_on_globe(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_get_killed(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_get_out_of_start(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_get_on_enemy_start(pos_start_of_turn[i], dice_roll)<< " ";
 
-  myfile <<  currently_on_enemy_start(pos_start_of_turn[player_num]);
-  myfile <<  currently_in_safe_zone(pos_start_of_turn[player_num]);
-  myfile <<  currently_in_non_danger_zone(pos_start_of_turn[player_num]);
-  myfile <<  currently_on_globe(pos_start_of_turn[player_num]);
+    myfile <<  currently_on_enemy_start(pos_start_of_turn[i])<< " ";
+    myfile <<  currently_in_safe_zone(pos_start_of_turn[i])<< " ";
+    myfile <<  currently_in_non_danger_zone(pos_start_of_turn[i])<< " ";
+    myfile <<  currently_on_globe(pos_start_of_turn[i])<< " ";
+  }
 
   // TODO Not needed, consider how this function should work
   // Also what to do if all players are at home?
-  myfile <<  player_num;
+  // Idea. make 52 inputs (all states of all players) then output tells witch to choose (0001 = pice 3) (0010 = pice 2) (0100  = pice 1) (1000  = pice 0)
+  myfile <<  "\n";
+
+  switch (player_num) {
+    case 0:
+      myfile << "1 0 0 0";
+      break;
+    case 1:
+      myfile << "0 1 0 0";
+      break;
+    case 2:
+      myfile << "0 0 1 0";
+      break;
+    case 3:
+      myfile << "0 0 0 1";
+      break;
+    default:
+      myfile << "ERROR";
+      break;
+  }
 
   myfile <<  "\n";
   myfile.close();
@@ -334,10 +364,9 @@ int super_ludo_player::record_my_games(){
 
 
 // TODO's:
+// TODO: MAKE IN GOAL FUNCTION
 // Will stacked players hit home people from own team? NO - SEE "send_them_home"
 // TODO . Is it "i <= pos_start_of_turn.size()" or "i < pos_start_of_turn.size()"
-
-// I SUSPECT A BUG WHEN PLAYERS ARE IN SAFE ZONE
 
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // Neural network, to train after my play style
