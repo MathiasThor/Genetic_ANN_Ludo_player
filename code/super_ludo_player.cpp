@@ -3,6 +3,7 @@
 #include <game.h>
 #include <iostream>
 #include <fstream>
+#include "floatfann.h"
 using namespace std;
 
 super_ludo_player::super_ludo_player():
@@ -13,52 +14,10 @@ super_ludo_player::super_ludo_player():
 }
 
 int super_ludo_player::make_decision(){
-
-    for (int i = 0; i < 4; i++) {
-      can_kill(pos_start_of_turn[i], dice_roll);
-      can_get_home(pos_start_of_turn[i], dice_roll);
-      can_enter_safe_zone(pos_start_of_turn[i], dice_roll);
-      can_get_on_star(pos_start_of_turn[i], dice_roll);
-      can_get_on_globe(pos_start_of_turn[i], dice_roll);
-      can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll);
-      currently_in_safe_zone(pos_start_of_turn[i]);
-      currently_in_non_danger_zone(pos_start_of_turn[i]);
-      currently_on_globe(pos_start_of_turn[i]);
-      enemy_globe(pos_start_of_turn[i]);
-
-      // if (can_kill(pos_start_of_turn[i],dice_roll)) {
-      //   debug_stop("KILLY", pos_start_of_turn[i], true);
-      // }
-    }
-
-    if(dice_roll == 6){
-        for(int i = 0; i < 4; ++i){
-            if(pos_start_of_turn[i]<0){
-                std::cout << "picked player " << i << std::endl;
-                return i;
-            }
-        }
-        for(int i = 0; i < 4; ++i){
-            if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
-                std::cout << "picked player " << i << std::endl;
-                return i;
-            }
-        }
-    } else {
-        for(int i = 0; i < 4; ++i){
-            if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
-                std::cout << "picked player " << i << std::endl;
-                return i;
-            }
-        }
-        for(int i = 0; i < 4; ++i){ //maybe they are all locked in
-            if(pos_start_of_turn[i]<0){
-                std::cout << "picked player " << i << std::endl;
-                return i;
-            }
-        }
-    }
-    return -1;
+  fann_type *calc_out;
+  fann_type input[56];
+  struct fann *ann = fann_create_from_file("./../../ludo_player.net");
+  return -1;
 }
 
 // OK
@@ -124,7 +83,7 @@ bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // Seem
 
 // OK
 bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // OK
-  if ( pos != -1 && pos != 99 && !can_enter_safe_zone(pos,new_dice_roll))
+  if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos))
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
        pos+new_dice_roll == 44 || pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
        pos+new_dice_roll == 37 || pos+new_dice_roll == 50 ) {
@@ -176,22 +135,57 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
 }
 
 // OK
-bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){ // TODO STAR JUMP OUT OF DANGER AND "MAYBE" STAR JUMP DANGER?
+bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos)){
-    for (int i = 4; i < pos_start_of_turn.size(); i++) {
-      for (int j = 1; j < 6; j++) {
-        if (pos+new_dice_roll >= 6) {
-          if (pos_start_of_turn[i] == (pos+new_dice_roll-j)) {
-            return false;
+    if (can_get_on_star(pos,new_dice_roll)) {
+      int star_jump;
+      if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 ||
+         pos+new_dice_roll == 31 || pos+new_dice_roll == 44){
+          star_jump = 6;
+      }
+      else if(pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
+              pos+new_dice_roll == 37 || pos+new_dice_roll == 50){
+          star_jump = 7;
+      }
+      for (int i = 4; i < pos_start_of_turn.size(); i++) {
+        for (int j = 1; j < 6; j++) {
+          if (pos+new_dice_roll+star_jump >= 6) {
+            if (pos_start_of_turn[i] == (pos+new_dice_roll+star_jump-j)) {
+              return false;
+            }
+          }
+          else{
+            if (pos_start_of_turn[i] == 52+(pos+new_dice_roll+star_jump-j)) {
+              return false;
+            }
           }
         }
-        else{
-          if (pos_start_of_turn[i] == 52+(pos+new_dice_roll-j)) {
-            return false;
+      }
+    } else {
+      for (int i = 4; i < pos_start_of_turn.size(); i++) {
+        for (int j = 1; j < 6; j++) {
+          if (pos+new_dice_roll >= 6) {
+            if (pos_start_of_turn[i] == (pos+new_dice_roll-j)) {
+              return false;
+            }
+          }
+          else{
+            if (pos_start_of_turn[i] == 52+(pos+new_dice_roll-j)) {
+              return false;
+            }
           }
         }
       }
     }
+    return true;
+  }
+  return false;
+}
+
+// OK
+bool super_ludo_player::currently_home(int pos){
+  if ( pos == 99 ) {
+    //debug_stop("HOME", pos, false);
     return true;
   }
   return false;
@@ -242,7 +236,7 @@ bool super_ludo_player::currently_on_enemy_start(int pos){
 
 // OK
 bool super_ludo_player::can_get_killed(int pos, int new_dice_roll){
-  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) && pos+new_dice_roll > 50)
+  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) || pos+new_dice_roll > 50)
     return false;
 
   if (enemy_globe(pos+new_dice_roll)) {
@@ -261,8 +255,11 @@ bool super_ludo_player::can_get_out_of_start(int pos, int new_dice_roll){
 
 // OK
 bool super_ludo_player::enemy_globe(int pos){
+  if (pos == -1 || pos == 99 || currently_in_safe_zone(pos))
+    return false;
+
   for (int i = 4; i < pos_start_of_turn.size(); i++) {
-    if (pos == pos_start_of_turn[i] && (currently_on_globe(pos_start_of_turn[i]) || currently_on_enemy_start(pos_start_of_turn[i])) ) {
+    if ((pos == pos_start_of_turn[i] && (currently_on_globe(pos_start_of_turn[i])) || currently_on_enemy_start(pos_start_of_turn[i])) ) {
       return true;
     }
   }
@@ -300,19 +297,30 @@ void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positi
 }
 
 int super_ludo_player::record_my_games(){
+  cout << "\n---\n\n";
+
   for (int i = 0; i < 4; i++) {
     std::cout << "Player " << i << " Position: " << pos_start_of_turn[i] << std::endl;
   }
-  cout << "\n---\n\n";
 
-  if (dice_roll != 6 && pos_start_of_turn[0] == -1 && pos_start_of_turn[1] == -1 && pos_start_of_turn[2] == -1 && pos_start_of_turn[3] == -1) {
+  // TODO THIS FUNCTION SHOULD ALSO BE IN THE FINAL ONE
+  if (dice_roll != 6 &&
+    (pos_start_of_turn[0] == -1 || pos_start_of_turn[0] == 99) &&
+    (pos_start_of_turn[1] == -1 || pos_start_of_turn[1] == 99) &&
+    (pos_start_of_turn[2] == -1 || pos_start_of_turn[2] == 99) &&
+    (pos_start_of_turn[3] == -1 || pos_start_of_turn[3] == 99)) {
     return -1;
   }
 
   cout << "enter player to move: ";
   int player_num = 0;
-  cin >> player_num;
-  cout << endl;
+  while (true) {
+    cin >> player_num;
+    cout << endl;
+    if ((pos_start_of_turn[player_num] == -1 && dice_roll != 6) || pos_start_of_turn[player_num] == 99) {
+      cout << "can't move this player\nenter new player to move: ";
+    } else break;
+  }
 
   ofstream myfile;
   myfile.open ("plays.data", ios::app);
@@ -332,11 +340,9 @@ int super_ludo_player::record_my_games(){
     myfile <<  currently_in_safe_zone(pos_start_of_turn[i])<< " ";
     myfile <<  currently_in_non_danger_zone(pos_start_of_turn[i])<< " ";
     myfile <<  currently_on_globe(pos_start_of_turn[i])<< " ";
+    myfile <<  currently_home(pos_start_of_turn[i])<< " ";
   }
 
-  // TODO Not needed, consider how this function should work
-  // Also what to do if all players are at home?
-  // Idea. make 52 inputs (all states of all players) then output tells witch to choose (0001 = pice 3) (0010 = pice 2) (0100  = pice 1) (1000  = pice 0)
   myfile <<  "\n";
 
   switch (player_num) {
@@ -364,9 +370,7 @@ int super_ludo_player::record_my_games(){
 
 
 // TODO's:
-// TODO: MAKE IN GOAL FUNCTION
 // Will stacked players hit home people from own team? NO - SEE "send_them_home"
-// TODO . Is it "i <= pos_start_of_turn.size()" or "i < pos_start_of_turn.size()"
 
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // Neural network, to train after my play style

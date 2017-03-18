@@ -1,19 +1,21 @@
-import plotly.plotly as py
-import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Create random data with numpy
 import numpy as np
 
-N = 500
-random_x = np.linspace(0, 1, N)
-random_y = np.random.randn(N)
+with open("tmp.txt") as f:
+    error = f.readlines()
 
-# Create a trace
-trace = go.Scatter(
-    x = random_x,
-    y = random_y
-)
+epokes =  []
+for i in xrange(len(error)):
+    epokes.append(i);
 
-data = [trace]
-
-py.iplot(data, filename='basic-line')
+plt.style.use('grayscale') # seaborn-bright	
+plt.plot(epokes, error)
+plt.ylabel('error')
+plt.xlabel('epoch')
+#plt.title('Error')
+plt.grid(True)
+plt.savefig("test.png")
+plt.show()
