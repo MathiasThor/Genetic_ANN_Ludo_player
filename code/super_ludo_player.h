@@ -21,6 +21,7 @@ private:
     bool can_get_killed(int pos, int new_dice_roll);
     bool can_get_out_of_start(int pos, int new_dice_roll);
     bool can_get_on_enemy_start(int pos, int new_dice_roll);
+    bool can_move(int pos, int new_dice_roll);
 
     bool currently_on_enemy_start(int pos);
     bool currently_in_safe_zone(int pos);

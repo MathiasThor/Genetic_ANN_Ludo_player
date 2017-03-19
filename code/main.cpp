@@ -15,8 +15,8 @@ int main(int argc, char *argv[]){
 
     //instanciate the players here
     ludo_player p1_green;
-    ludo_player_random p2_yellow;
-    ludo_player_random p3_blue;
+    ludo_player p2_yellow;
+    ludo_player p3_blue;
     super_ludo_player p4_red;
 
     game g;

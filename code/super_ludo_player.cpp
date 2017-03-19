@@ -3,7 +3,11 @@
 #include <game.h>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
+#include <vector>
 #include "floatfann.h"
+#include "fann.h"
+
 using namespace std;
 
 super_ludo_player::super_ludo_player():
@@ -14,10 +18,126 @@ super_ludo_player::super_ludo_player():
 }
 
 int super_ludo_player::make_decision(){
+
+  if (dice_roll != 6 &&
+    (pos_start_of_turn[0] == -1 || pos_start_of_turn[0] == 99) &&
+    (pos_start_of_turn[1] == -1 || pos_start_of_turn[1] == 99) &&
+    (pos_start_of_turn[2] == -1 || pos_start_of_turn[2] == 99) &&
+    (pos_start_of_turn[3] == -1 || pos_start_of_turn[3] == 99)) {
+    return -1;
+  }
+
   fann_type *calc_out;
-  fann_type input[56];
-  struct fann *ann = fann_create_from_file("./../../ludo_player.net");
-  return -1;
+  fann_type input[60];
+  struct fann *ann = fann_create_from_file("./../../ann_code/ludo_player.net");
+
+  for (int i = 0; i < 4; i++) {
+    input[0+(i*15)] =can_kill(pos_start_of_turn[i], dice_roll);
+    input[1+(i*15)] =can_get_home(pos_start_of_turn[i], dice_roll);
+    input[2+(i*15)] =can_enter_safe_zone(pos_start_of_turn[i], dice_roll);
+    input[3+(i*15)] =can_get_on_star(pos_start_of_turn[i], dice_roll);
+    input[4+(i*15)] =can_get_on_globe(pos_start_of_turn[i], dice_roll);
+    input[5+(i*15)] =can_enter_non_danger_zone(pos_start_of_turn[i], dice_roll);
+    input[6+(i*15)] =can_get_killed(pos_start_of_turn[i], dice_roll);
+    input[7+(i*15)] =can_get_out_of_start(pos_start_of_turn[i], dice_roll);
+    input[8+(i*15)] =can_get_on_enemy_start(pos_start_of_turn[i], dice_roll);
+    input[9+(i*15)] =can_move(pos_start_of_turn[i], dice_roll);
+    input[10+(i*15)] =currently_on_enemy_start(pos_start_of_turn[i]);
+    input[11+(i*15)] =currently_in_safe_zone(pos_start_of_turn[i]);
+    input[12+(i*15)] =currently_in_non_danger_zone(pos_start_of_turn[i]);
+    input[13+(i*15)] =currently_on_globe(pos_start_of_turn[i]);
+    input[14+(i*15)] =currently_home(pos_start_of_turn[i]);
+  }
+
+  calc_out = fann_run(ann, input);
+
+  // for (int i = 0; i < 10; i++) {
+  //   cout << i << ",";
+  // }
+  // cout << endl;
+  // for (int i = 0; i < 60; i++) {
+  //   if (i % 15 == 0 && i != 0)
+  //     cout << endl;
+  //   cout << input[i] << ",";
+  // }
+  // printf("\nNeural Network Output -> %f %f %f %f\n", calc_out[0], calc_out[1], calc_out[2], calc_out[3]);
+
+  double fourth_largest = 0;
+  double third_largest = 0;
+  double second_largest = 0;
+  double largest = 0;
+  int fourth_largest_index = -1;
+  int third_largest_index = -1;
+  int second_largest_index = -1;
+  int largest_index = -1;
+  //Finding Largest
+  for (int i = 0; i < 4; ++i)
+    if (calc_out[i]>largest){
+      largest = calc_out[i];
+      largest_index = i;
+    }
+  //finding second largset
+  for (int i = 0; i < 4; ++i)
+   if (calc_out[i]>second_largest){
+      if (calc_out[i] == largest)
+            continue;
+      second_largest = calc_out[i];
+      second_largest_index = i;
+   }
+  //finding third largset
+  for (int i = 0; i < 4; ++i)
+   if (calc_out[i]>third_largest){
+      if (calc_out[i] == largest || calc_out[i] == second_largest)
+            continue;
+      third_largest = calc_out[i];
+      third_largest_index = i;
+   }
+  //finding fourth largset
+  for (int i = 0; i < 4; ++i)
+   if (calc_out[i]>third_largest){
+      if (calc_out[i] == largest || calc_out[i] == second_largest || calc_out[i] == third_largest)
+            continue;
+      fourth_largest = calc_out[i];
+      fourth_largest_index = i;
+   }
+
+  // std::cout << "Check" << std::endl;
+  // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+
+  fann_destroy(ann);
+
+  if ( !can_move(pos_start_of_turn[largest_index], dice_roll) ){
+    if ( !can_move(pos_start_of_turn[second_largest_index], dice_roll) ) {
+      if ( !can_move(pos_start_of_turn[third_largest_index], dice_roll) ) {
+        if ( !can_move(pos_start_of_turn[fourth_largest_index], dice_roll) ) {
+          std::cout << "*** ERROR ***" << std::endl;
+          std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+        } else {
+          cout << "- ";
+          std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+          return fourth_largest_index;
+        }
+      } else {
+        cout << "+ ";
+        std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+        return third_largest_index;
+      }
+    } else {
+      cout << "* ";
+      std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+      return second_largest_index;
+    }
+  } else {
+    return largest_index;
+  }
+
+  // cout << "Picked player: " << largest_index << endl;
+  // cout << "His position is: " << pos_start_of_turn[largest_index] << endl;
+  //
+  // if ((pos_start_of_turn[player_pick] == -1 || pos_start_of_turn[player_pick] == 99) && dice_roll != 6) {
+  //   std::cout << "ERROR *** Press ENTER to continue" << std::endl;
+  //   std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+  // }
 }
 
 // OK
@@ -57,14 +177,14 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
   }
 
   if (num_of_players == 1 && star_jump != 0) {
-    debug_stop("KILL PLAYER", pos, true);
+    //debug_stop("KILL PLAYER", pos, true);
     return true;
   }
   return false;
 }
 
 // OK
-bool super_ludo_player::can_get_home(int pos, int new_dice_roll){ // Seems OK (few random plays)
+bool super_ludo_player::can_get_home(int pos, int new_dice_roll){
   if ( pos + new_dice_roll == 56 || pos + new_dice_roll == 50 ) {
     //debug_stop("GET HOME", pos, false);
     return true;
@@ -73,12 +193,19 @@ bool super_ludo_player::can_get_home(int pos, int new_dice_roll){ // Seems OK (f
 }
 
 // OK
-bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){ // Seems OK (few random plays)
+bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){
   if ( pos + new_dice_roll >= 51 && pos < 51) {
     //debug_stop("ENTER SAFE", pos, false);
     return true;
   }
   return false;
+}
+
+// OK
+bool super_ludo_player::can_move(int pos, int new_dice_roll){
+  if ((pos == -1 && new_dice_roll != 6) || pos == 99)
+    return false;
+  return true;
 }
 
 // OK
@@ -269,7 +396,8 @@ bool super_ludo_player::enemy_globe(int pos){
 void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
-    int decision = record_my_games();//make_decision();
+    int decision = make_decision();
+    //int decision = record_my_games();
     emit select_piece(decision);
 }
 
@@ -299,11 +427,11 @@ void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positi
 int super_ludo_player::record_my_games(){
   cout << "\n---\n\n";
 
+  cout << "Dice Roll: "<< dice_roll << endl;
   for (int i = 0; i < 4; i++) {
     std::cout << "Player " << i << " Position: " << pos_start_of_turn[i] << std::endl;
   }
 
-  // TODO THIS FUNCTION SHOULD ALSO BE IN THE FINAL ONE
   if (dice_roll != 6 &&
     (pos_start_of_turn[0] == -1 || pos_start_of_turn[0] == 99) &&
     (pos_start_of_turn[1] == -1 || pos_start_of_turn[1] == 99) &&
@@ -317,7 +445,7 @@ int super_ludo_player::record_my_games(){
   while (true) {
     cin >> player_num;
     cout << endl;
-    if ((pos_start_of_turn[player_num] == -1 && dice_roll != 6) || pos_start_of_turn[player_num] == 99) {
+    if ( !can_move(pos_start_of_turn[player_num], dice_roll) ) {
       cout << "can't move this player\nenter new player to move: ";
     } else break;
   }
@@ -335,6 +463,7 @@ int super_ludo_player::record_my_games(){
     myfile <<  can_get_killed(pos_start_of_turn[i], dice_roll)<< " ";
     myfile <<  can_get_out_of_start(pos_start_of_turn[i], dice_roll)<< " ";
     myfile <<  can_get_on_enemy_start(pos_start_of_turn[i], dice_roll)<< " ";
+    myfile <<  can_move(pos_start_of_turn[i], dice_roll)<< " ";
 
     myfile <<  currently_on_enemy_start(pos_start_of_turn[i])<< " ";
     myfile <<  currently_in_safe_zone(pos_start_of_turn[i])<< " ";
@@ -368,9 +497,7 @@ int super_ludo_player::record_my_games(){
   return player_num;
 }
 
-
-// TODO's:
+// TODO: Implement - Can Move (i.e -1 and 99 cant move)
 // Will stacked players hit home people from own team? NO - SEE "send_them_home"
-
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // Neural network, to train after my play style

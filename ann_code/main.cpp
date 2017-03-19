@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     cout << "========\nTRAINING\n========\n" << endl;
 
     // SETUP NETWORK
-    const unsigned int num_input = 56;
+    const unsigned int num_input = 60;
     const unsigned int num_output = 4;
     const unsigned int num_layers = 4;
     const unsigned int num_neurons_hidden = 16;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     fann_set_activation_function_output(ann, FANN_SIGMOID);
 
     // GIVE TRAINING DATA AND START TRAINING
-    fann_train_on_file(ann, "plays.data", max_epochs,
+    fann_train_on_file(ann, "./../code/build/plays.data", max_epochs,
         epochs_between_reports, desired_error);
 
     // SAVE THE NETWORK AND DESTROY IT
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
     // MAKE INPUT AND OUTPUT LISTS
     fann_type *calc_out;
-    fann_type input[56];
+    fann_type input[60];
 
     // BUG OUTDATED
     // 1000
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     // 0010
     //std::vector<float> input_vec{0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0};
     // 0001
-    std::vector<float> input_vec{0,0,0,1,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0};
+    std::vector<float> input_vec{0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0};
 
     // GET THE NETWORK
     struct fann *ann = fann_create_from_file("ludo_player.net");
