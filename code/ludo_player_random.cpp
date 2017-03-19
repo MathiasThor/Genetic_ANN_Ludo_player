@@ -24,11 +24,7 @@ int ludo_player_random::make_decision(){
         }
     }
     if(valid_moves.size()==0){
-        for(int i = 0; i < 4; ++i){
-            if(pos_start_of_turn[i] != 99){
-                valid_moves.push_back(i);
-            }
-        }
+      return -1;
     }
     std::uniform_int_distribution<> piece(0, valid_moves.size()-1);
     int select = piece(gen);

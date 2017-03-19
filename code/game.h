@@ -37,6 +37,7 @@ private:
         }
     }
 public:
+    std::vector<int> wins{0,0,0,0};
     int color;
     std::vector<int> player_positions;
     void rollDice(){

@@ -14,15 +14,15 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<positions_and_dice>();
 
     //instanciate the players here
-    ludo_player p1_green;
-    ludo_player p2_yellow;
-    ludo_player p3_blue;
+    ludo_player_random p1_green;
+    ludo_player_random p2_yellow;
+    ludo_player_random p3_blue;
     super_ludo_player p4_red;
 
     game g;
-    g.setGameDelay(10); //if you want to see the game, set a delay
+    g.setGameDelay(0); //if you want to see the game, set a delay
 
-    //* Add a GUI <-- remove the '/' to uncomment block
+    /* Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
@@ -55,11 +55,16 @@ int main(int argc, char *argv[]){
     QObject::connect(&g, SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
     QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
-    for(int i = 0; i < 10000; ++i){
+    for(int i = 0; i < 1000; ++i){
         g.start();
         a.exec();
         g.reset();
     }
+
+    std::cout << "Player 0 (Green)  Won " << g.wins[0] << " games" << std::endl;
+    std::cout << "Player 1 (Yellow) Won " << g.wins[1] << " games" << std::endl;
+    std::cout << "Player 2 (Blue)   Won " << g.wins[2] << " games" << std::endl;
+    std::cout << "Player 3 (Red)    Won " << g.wins[3] << " games" << std::endl;
 
     // g.start();
     // a.exec();

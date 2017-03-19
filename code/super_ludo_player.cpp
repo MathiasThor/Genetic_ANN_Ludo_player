@@ -114,17 +114,17 @@ int super_ludo_player::make_decision(){
           std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         } else {
           cout << "- ";
-          std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+          // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
           return fourth_largest_index;
         }
       } else {
         cout << "+ ";
-        std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+        // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         return third_largest_index;
       }
     } else {
       cout << "* ";
-      std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+      // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
       return second_largest_index;
     }
   } else {
