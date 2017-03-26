@@ -34,6 +34,9 @@ private:
     int record_my_games();
     void debug_stop(std::string action, int pos, bool cout_positions);
 
+    union { double input; unsigned long long output;} data;
+    //union { float input; int output;} data;
+
 public:
     super_ludo_player();
 signals:

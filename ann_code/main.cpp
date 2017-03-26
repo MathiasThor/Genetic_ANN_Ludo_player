@@ -2,7 +2,8 @@
 #include <iostream>
 #include <vector>
 #include "floatfann.h"
-#include "fann.h"
+#include "fann_cpp.h"
+#include <array>
 
 using namespace std;
 // http://leenissen.dk/fann/wp/help/getting-started/
@@ -17,27 +18,35 @@ int main(int argc, char* argv[])
     // SETUP NETWORK
     const unsigned int num_input = 60;
     const unsigned int num_output = 4;
-    const unsigned int num_layers = 4;
-    const unsigned int num_neurons_hidden = 16;
+    const unsigned int num_layers = 3;
+    const unsigned int num_neurons_hidden = 10; // TODO, when is it acceptable?
     const float desired_error = (const float) 0.01;
+    const float learning_rate = (const float) 0.8;
+    const float init_weights_range = (const float) 0.77;
     const unsigned int max_epochs = 500000;
     const unsigned int epochs_between_reports = 1;
 
     // CREATE NETWORK
-    struct fann *ann = fann_create_standard(num_layers, num_input,
-        num_neurons_hidden, num_neurons_hidden, num_output);
 
-    // SET ACTIVATION FUNCTIONS
-    fann_set_activation_function_hidden(ann, FANN_SIGMOID);
-    fann_set_activation_function_output(ann, FANN_SIGMOID);
+    FANN::neural_net net;
+    const std::array<uint, 4> layers = {num_input, num_neurons_hidden, num_output};
+    net.create_standard_array(num_layers, layers.data());
+
+    // SETUP NETWORK
+    net.set_activation_function_hidden(FANN::SIGMOID);
+    net.set_activation_function_output(FANN::SIGMOID);
+    net.set_training_algorithm(FANN::TRAIN_BATCH); // BATCH TRAIN MODE
+    net.set_learning_rate(learning_rate);
+    net.randomize_weights(-init_weights_range, init_weights_range); // Suggested by Thimm and Fiesler
+    // TODO include learning momentum? net.set_learning_momentum(SOME_FLOAT?);
 
     // GIVE TRAINING DATA AND START TRAINING
-    fann_train_on_file(ann, "./../code/build/plays.data", max_epochs,
+    net.train_on_file("./../code/build/plays.data", max_epochs,
         epochs_between_reports, desired_error);
 
     // SAVE THE NETWORK AND DESTROY IT
-    fann_save(ann, "ludo_player.net");
-    fann_destroy(ann);
+    net.save("ludo_player.net");
+    net.destroy();
   }
   else if (choise=="test") {
     cout << "========\nTESTING\n========\n" << endl;
@@ -50,14 +59,15 @@ int main(int argc, char* argv[])
     // 1000
     //std::vector<float> input_vec{0,0,0,0,0,1,1,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0};
     // 0100
-    //std::vector<float> input_vec{0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    std::vector<float> input_vec{0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     // 0010
     //std::vector<float> input_vec{0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0};
     // 0001
-    std::vector<float> input_vec{0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0};
+    //std::vector<float> input_vec{0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0};
 
     // GET THE NETWORK
-    struct fann *ann = fann_create_from_file("ludo_player.net");
+    FANN::neural_net net;
+    net.create_from_file("ludo_player.net");
 
     // FILL UP WITH SOME INPUT
     for (int i = 0; i < input_vec.size(); i++) {
@@ -65,10 +75,26 @@ int main(int argc, char* argv[])
     }
 
     // CALCULATE OUTPUT FROM NETWORK
-    calc_out = fann_run(ann, input);
+    calc_out = net.run(input);
     printf("ludo player test -> %f %f %f %f\n", calc_out[0], calc_out[1], calc_out[2], calc_out[3]);
 
-    fann_destroy(ann);
+    net.destroy();
+  }
+  else if (choise=="weights") {
+    cout << "========\nWEIGHTS\n========\n" << endl;
+    FANN::neural_net net;
+    net.create_from_file("ludo_player.net");
+    struct fann_connection 	*connections;
+    unsigned int num_connections;
+
+    num_connections = net.get_total_connections();
+    connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
+    net.get_connection_array(connections);
+
+    for (int i = 0; i < num_connections; ++i) {
+      printf("weight from %u to %u: %f\n", connections[i].from_neuron,
+             connections[i].to_neuron, connections[i].weight);
+    }
   }
 
     return 0;

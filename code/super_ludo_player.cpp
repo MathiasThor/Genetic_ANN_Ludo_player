@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include <vector>
 #include "floatfann.h"
-#include "fann.h"
+#include "fann_cpp.h"
+#include <bitset>
 
 using namespace std;
 
@@ -19,6 +20,30 @@ super_ludo_player::super_ludo_player():
 
 int super_ludo_player::make_decision(){
 
+  // TODO implement bitset into functions
+  // data.input = -12.12345678910111213141516171819;
+  // bitset<sizeof(double) * CHAR_BIT>   bits(data.output);
+  //
+  // static_assert(sizeof(uint64_t) == sizeof(double), "Cannot use this!");
+  //
+  // uint64_t const u = bits.to_ullong();
+  // double d;
+  //
+  // // Aliases to `char*` are explicitly allowed in the Standard (and only them)
+  // char const* cu = reinterpret_cast<char const*>(&u);
+  // char* cd = reinterpret_cast<char*>(&d);
+  //
+  // // Copy the bitwise representation from u to d
+  // memcpy(cd, cu, sizeof(u));
+  //
+  // printf("True number:    %4.200f\n", data.input);
+  // cout << "Converted bits: "<< bits<<endl;
+  // printf("Converted back: %4.100f\n", d);
+  //
+  // cout << "Press ENTER to continue" << std::endl;
+  // cin.ignore(std::cin.rdbuf()->in_avail()+1);
+
+
   if (dice_roll != 6 &&
     (pos_start_of_turn[0] == -1 || pos_start_of_turn[0] == 99) &&
     (pos_start_of_turn[1] == -1 || pos_start_of_turn[1] == 99) &&
@@ -29,7 +54,8 @@ int super_ludo_player::make_decision(){
 
   fann_type *calc_out;
   fann_type input[60];
-  struct fann *ann = fann_create_from_file("./../../ann_code/ludo_player.net");
+  FANN::neural_net net;
+  net.create_from_file("./../../ann_code/ludo_player.net");
 
   for (int i = 0; i < 4; i++) {
     input[0+(i*15)] =can_kill(pos_start_of_turn[i], dice_roll);
@@ -49,7 +75,7 @@ int super_ludo_player::make_decision(){
     input[14+(i*15)] =currently_home(pos_start_of_turn[i]);
   }
 
-  calc_out = fann_run(ann, input);
+  calc_out = net.run(input);
 
   // for (int i = 0; i < 10; i++) {
   //   cout << i << ",";
@@ -104,7 +130,7 @@ int super_ludo_player::make_decision(){
   // std::cout << "Check" << std::endl;
   // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
 
-  fann_destroy(ann);
+  net.destroy();
 
   if ( !can_move(pos_start_of_turn[largest_index], dice_roll) ){
     if ( !can_move(pos_start_of_turn[second_largest_index], dice_roll) ) {
@@ -497,7 +523,6 @@ int super_ludo_player::record_my_games(){
   return player_num;
 }
 
-// TODO: Implement - Can Move (i.e -1 and 99 cant move)
 // Will stacked players hit home people from own team? NO - SEE "send_them_home"
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
 // Neural network, to train after my play style

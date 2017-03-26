@@ -1,0 +1,16 @@
+1. Coding: Choose the Representation
+Byte strig
+
+2. Fitness: Define Fitness Evaluation Procedure
+
+
+3. Selection strategy: Roulette, rank, …
+
+
+4. Parameters: Identify GA parameters (crossover & mutation rates)
+
+
+5. Replacement: Choose GA type (generational, steady‐state, etc.)
+
+
+6. Define stopping criterion (manual, after X generations)
