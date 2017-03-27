@@ -17,6 +17,9 @@ SOURCES += main.cpp\
     game.cpp \
     ludo_player.cpp \
     super_ludo_player.cpp \
+    super_ludo_player_state_functions.cpp \
+    super_ludo_player_record_games.cpp \
+    super_ludo_player_utils.cpp \
     ludo_player_random.cpp
 
 HEADERS  += dialog.h \
@@ -27,5 +30,7 @@ HEADERS  += dialog.h \
     ludo_player_random.h
 
 FORMS    += dialog.ui
+
+LIBS     += -lfann
 
 QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Wunused

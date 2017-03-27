@@ -2,7 +2,16 @@
 #define SUPER_LUDO_PLAYER_H
 #include <QObject>
 #include <iostream>
+#include <random>
+#include <game.h>
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <vector>
+#include "floatfann.h"
+#include "fann_cpp.h"
 #include "positions_and_dice.h"
+#include <bitset>
 
 class super_ludo_player : public QObject {
     Q_OBJECT
@@ -32,7 +41,11 @@ private:
     bool enemy_globe(int pos);
 
     int record_my_games();
+
     void debug_stop(std::string action, int pos, bool cout_positions);
+    std::bitset<64> double_to_bitset(double);
+    double bitset_to_double(std::bitset<64>);
+    std::vector<int> sorted_index(fann_type*);
 
     union { double input; unsigned long long output;} data;
     //union { float input; int output;} data;

@@ -1,5 +1,5 @@
 1. Coding: Choose the Representation
-Byte strig
+Byte string
 
 2. Fitness: Define Fitness Evaluation Procedure
 
