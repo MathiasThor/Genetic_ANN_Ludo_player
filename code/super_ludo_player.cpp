@@ -32,9 +32,14 @@ int super_ludo_player::make_decision(){
   connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
   net.get_connection_array(connections);
 
-  for (int i = 0; i < num_connections; ++i) {
-    connections[i].weight = bitset_to_double(double_to_bitset(connections[i].weight));
-  }
+  chromosome new_chromo = get_chromosome(connections, num_connections);
+
+  chromosome new_chromo_with_gaus = add_gaussian_noise_to_chromosome(new_chromo);
+
+  std::cout << bitset_to_double(new_chromo[1]) << "\nvs.\n" << bitset_to_double(new_chromo_with_gaus[1]) << endl;
+
+
+  debug_stop("check", 99, false);
   // TODO: REMOVE
 
   for (int i = 0; i < 4; i++) {

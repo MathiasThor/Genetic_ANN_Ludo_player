@@ -12,6 +12,11 @@
 #include "fann_cpp.h"
 #include "positions_and_dice.h"
 #include <bitset>
+#include <iterator>
+#include <random>
+#include <chrono>
+
+typedef std::vector< std::bitset<64> > chromosome;
 
 class super_ludo_player : public QObject {
     Q_OBJECT
@@ -46,6 +51,9 @@ private:
     std::bitset<64> double_to_bitset(double);
     double bitset_to_double(std::bitset<64>);
     std::vector<int> sorted_index(fann_type*);
+    chromosome get_chromosome( fann_connection*, unsigned int );
+    chromosome add_gaussian_noise_to_chromosome( chromosome input_chromo );
+
 
     union { double input; unsigned long long output;} data;
     //union { float input; int output;} data;
