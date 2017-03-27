@@ -17,10 +17,18 @@
 #include <chrono>
 
 typedef std::vector< std::bitset<64> > chromosome;
+typedef std::vector< std::vector< std::bitset<64> > > population;
+
 
 class super_ludo_player : public QObject {
     Q_OBJECT
 private:
+    // CONSTANTS
+    const int POP_SIZE = 10;
+    FANN::neural_net net;
+    population super_population;
+
+    // FUNCTIONS
     std::vector<int> pos_start_of_turn;
     std::vector<int> pos_end_of_turn;
     int dice_roll;
@@ -53,10 +61,7 @@ private:
     std::vector<int> sorted_index(fann_type*);
     chromosome get_chromosome( fann_connection*, unsigned int );
     chromosome add_gaussian_noise_to_chromosome( chromosome input_chromo );
-
-
     union { double input; unsigned long long output;} data;
-    //union { float input; int output;} data;
 
 public:
     super_ludo_player();

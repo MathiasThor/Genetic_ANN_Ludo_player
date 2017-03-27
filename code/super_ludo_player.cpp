@@ -7,6 +7,17 @@ super_ludo_player::super_ludo_player():
   pos_end_of_turn(16),
   dice_roll(0)
 {
+  net.create_from_file("./../../ann_code/ludo_player.net");
+
+  unsigned int num_connections = net.get_total_connections();
+  struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
+  net.get_connection_array(connections);
+
+  super_population.push_back( get_chromosome(connections, num_connections) );
+
+  for (size_t i = 1; i < POP_SIZE; i++)
+    super_population.push_back( add_gaussian_noise_to_chromosome(super_population[0]) );
+
 }
 
 int super_ludo_player::make_decision(){
@@ -21,26 +32,6 @@ int super_ludo_player::make_decision(){
 
   fann_type *calc_out;
   fann_type input[60];
-  FANN::neural_net net;
-  net.create_from_file("./../../ann_code/ludo_player.net");
-
-  // TODO: REMOVE
-  struct fann_connection 	*connections;
-  unsigned int num_connections;
-
-  num_connections = net.get_total_connections();
-  connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
-  net.get_connection_array(connections);
-
-  chromosome new_chromo = get_chromosome(connections, num_connections);
-
-  chromosome new_chromo_with_gaus = add_gaussian_noise_to_chromosome(new_chromo);
-
-  std::cout << bitset_to_double(new_chromo[1]) << "\nvs.\n" << bitset_to_double(new_chromo_with_gaus[1]) << endl;
-
-
-  debug_stop("check", 99, false);
-  // TODO: REMOVE
 
   for (int i = 0; i < 4; i++) {
     input[0+(i*15)] =can_kill(pos_start_of_turn[i], dice_roll);
@@ -64,7 +55,7 @@ int super_ludo_player::make_decision(){
 
   vector<int> sorted_indexx = sorted_index(calc_out);
 
-  net.destroy();
+  //net.destroy();
 
   if ( !can_move(pos_start_of_turn[sorted_indexx[0]], dice_roll) ){
     if ( !can_move(pos_start_of_turn[sorted_indexx[1]], dice_roll) ) {
