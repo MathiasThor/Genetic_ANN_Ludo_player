@@ -2,15 +2,15 @@
 
 using namespace std;
 
-bitset<64> super_ludo_player::double_to_bitset(double input_double){
-  data.input = input_double;
-  bitset<64>   bits(data.output);
+bitset<32> super_ludo_player::float_to_bitset(float input_float){
+  data.input = input_float;
+  bitset<32>   bits(data.output);
   return bits;
 }
 
-double super_ludo_player::bitset_to_double(bitset<64> input_set){
-  uint64_t const u = input_set.to_ullong();
-  double d;
+float super_ludo_player::bitset_to_float(bitset<32> input_set){
+  uint32_t const u = input_set.to_ullong();
+  float d;
 
   // Aliases to `char*` are explicitly allowed in the Standard (and only them)
   char const* cu = reinterpret_cast<char const*>(&u);
@@ -21,11 +21,22 @@ double super_ludo_player::bitset_to_double(bitset<64> input_set){
   return d;
 }
 
+void super_ludo_player::set_chromosome_as_weights( chromosome input_chromo ){
+  unsigned int num_connections = net.get_total_connections();
+  struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
+  net.get_connection_array(connections);
+
+  for (int i = 0; i < num_connections; ++i)
+    connections[i].weight = bitset_to_float(input_chromo[i]);
+
+  net.set_weight_array(connections, num_connections);
+}
+
 chromosome super_ludo_player::get_chromosome( fann_connection* connections , unsigned int num_connections){
   chromosome new_chromo;
 
   for (int i = 0; i < num_connections; ++i)
-    new_chromo.push_back( double_to_bitset(connections[i].weight) );
+    new_chromo.push_back( float_to_bitset(connections[i].weight) );
 
   return new_chromo;
 }
@@ -42,9 +53,9 @@ chromosome super_ludo_player::add_gaussian_noise_to_chromosome( chromosome input
 
   // Add Gaussian noise
   for (size_t i = 0; i < input_chromo.size(); i++) {
-    tmp = bitset_to_double(input_chromo[i]);
+    tmp = bitset_to_float(input_chromo[i]);
     tmp += dist(generator);
-    output_chromo.push_back( double_to_bitset(tmp) );
+    output_chromo.push_back( float_to_bitset(tmp) );
   }
 
   return output_chromo;

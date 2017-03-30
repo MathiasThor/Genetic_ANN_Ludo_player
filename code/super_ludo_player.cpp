@@ -13,11 +13,27 @@ super_ludo_player::super_ludo_player():
   struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
   net.get_connection_array(connections);
 
-  super_population.push_back( get_chromosome(connections, num_connections) );
+  super_population.push_back( get_chromosome( connections, num_connections) );
 
   for (size_t i = 1; i < POP_SIZE; i++)
-    super_population.push_back( add_gaussian_noise_to_chromosome(super_population[0]) );
+    super_population.push_back( add_gaussian_noise_to_chromosome( super_population[0]) );
 
+  // TODO: THE FOLLOWING I ABLE TO RESIZE
+  // for (size_t i = 0; i < 8; i++)
+  //   super_population[0][0].reset(i);
+  //
+  // std::bitset<24> hello;
+  //
+  // for (size_t i = 31; i > 7; i--)
+  //   hello[i-8] = super_population[0][0][i];
+  //
+  // cout << endl;
+  // cout << hello << "\n" << super_population[0][0] << endl;
+
+  cout << "super_population 1: " << connections[0].weight << " = "<< super_population[0][0] << " = "<< bitset_to_float(super_population[0][0]) << endl;
+  debug_stop("h",2,false);
+  //Set gaussian noised chromosome as current
+  set_chromosome_as_weights(super_population[0]);
 }
 
 int super_ludo_player::make_decision(){

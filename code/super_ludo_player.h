@@ -16,9 +16,8 @@
 #include <random>
 #include <chrono>
 
-typedef std::vector< std::bitset<64> > chromosome;
-typedef std::vector< std::vector< std::bitset<64> > > population;
-
+typedef std::vector< std::bitset<32> > chromosome;
+typedef std::vector< std::vector< std::bitset<32> > > population;
 
 class super_ludo_player : public QObject {
     Q_OBJECT
@@ -56,12 +55,13 @@ private:
     int record_my_games();
 
     void debug_stop(std::string action, int pos, bool cout_positions);
-    std::bitset<64> double_to_bitset(double);
-    double bitset_to_double(std::bitset<64>);
+    std::bitset<32> float_to_bitset(float);
+    float bitset_to_float(std::bitset<32>);
     std::vector<int> sorted_index(fann_type*);
     chromosome get_chromosome( fann_connection*, unsigned int );
     chromosome add_gaussian_noise_to_chromosome( chromosome input_chromo );
-    union { double input; unsigned long long output;} data;
+    void set_chromosome_as_weights( chromosome input_chromo);
+    union { float input; unsigned long long output;} data;
 
 public:
     super_ludo_player();
