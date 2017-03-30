@@ -2,12 +2,6 @@
 
 using namespace std;
 
-bitset<32> super_ludo_player::float_to_bitset(float input_float){
-  data.input = input_float;
-  bitset<32>   bits(data.output);
-  return bits;
-}
-
 float super_ludo_player::bitset_to_float(bitset<32> input_set){
   uint32_t const u = input_set.to_ullong();
   float d;
@@ -30,35 +24,6 @@ void super_ludo_player::set_chromosome_as_weights( chromosome input_chromo ){
     connections[i].weight = bitset_to_float(input_chromo[i]);
 
   net.set_weight_array(connections, num_connections);
-}
-
-chromosome super_ludo_player::get_chromosome( fann_connection* connections , unsigned int num_connections){
-  chromosome new_chromo;
-
-  for (int i = 0; i < num_connections; ++i)
-    new_chromo.push_back( float_to_bitset(connections[i].weight) );
-
-  return new_chromo;
-}
-
-chromosome super_ludo_player::add_gaussian_noise_to_chromosome( chromosome input_chromo ){
-  chromosome output_chromo;
-
-  // Define random generator with Gaussian distribution
-  const double mean = 0.0;
-  const double stddev = 1.0;
-  double tmp = 0;
-  std::default_random_engine generator (std::chrono::system_clock::now().time_since_epoch().count());
-  std::normal_distribution<double> dist(mean, stddev);
-
-  // Add Gaussian noise
-  for (size_t i = 0; i < input_chromo.size(); i++) {
-    tmp = bitset_to_float(input_chromo[i]);
-    tmp += dist(generator);
-    output_chromo.push_back( float_to_bitset(tmp) );
-  }
-
-  return output_chromo;
 }
 
 void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positions){

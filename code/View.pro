@@ -20,6 +20,7 @@ SOURCES += main.cpp\
     super_ludo_player_state_functions.cpp \
     super_ludo_player_record_games.cpp \
     super_ludo_player_utils.cpp \
+    genetic_algorithm.cpp \
     ludo_player_random.cpp
 
 HEADERS  += dialog.h \
@@ -27,6 +28,7 @@ HEADERS  += dialog.h \
     ludo_player.h \
     positions_and_dice.h \
     super_ludo_player.h \
+    genetic_algorithm.h \
     ludo_player_random.h
 
 FORMS    += dialog.ui

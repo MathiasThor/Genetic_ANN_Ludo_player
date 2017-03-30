@@ -17,15 +17,12 @@
 #include <chrono>
 
 typedef std::vector< std::bitset<32> > chromosome;
-typedef std::vector< std::vector< std::bitset<32> > > population;
 
 class super_ludo_player : public QObject {
     Q_OBJECT
 private:
     // CONSTANTS
-    const int POP_SIZE = 10;
     FANN::neural_net net;
-    population super_population;
 
     // FUNCTIONS
     std::vector<int> pos_start_of_turn;
@@ -55,16 +52,13 @@ private:
     int record_my_games();
 
     void debug_stop(std::string action, int pos, bool cout_positions);
-    std::bitset<32> float_to_bitset(float);
     float bitset_to_float(std::bitset<32>);
     std::vector<int> sorted_index(fann_type*);
-    chromosome get_chromosome( fann_connection*, unsigned int );
-    chromosome add_gaussian_noise_to_chromosome( chromosome input_chromo );
     void set_chromosome_as_weights( chromosome input_chromo);
     union { float input; unsigned long long output;} data;
 
 public:
-    super_ludo_player();
+    super_ludo_player(chromosome player_chromo);
 signals:
     void select_piece(int);
     void turn_complete(bool);

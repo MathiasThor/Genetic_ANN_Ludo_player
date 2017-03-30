@@ -2,38 +2,13 @@
 
 using namespace std;
 
-super_ludo_player::super_ludo_player():
+super_ludo_player::super_ludo_player(chromosome player_chromo):
   pos_start_of_turn(16),
   pos_end_of_turn(16),
   dice_roll(0)
 {
   net.create_from_file("./../../ann_code/ludo_player.net");
-
-  unsigned int num_connections = net.get_total_connections();
-  struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
-  net.get_connection_array(connections);
-
-  super_population.push_back( get_chromosome( connections, num_connections) );
-
-  for (size_t i = 1; i < POP_SIZE; i++)
-    super_population.push_back( add_gaussian_noise_to_chromosome( super_population[0]) );
-
-  // TODO: THE FOLLOWING I ABLE TO RESIZE
-  // for (size_t i = 0; i < 8; i++)
-  //   super_population[0][0].reset(i);
-  //
-  // std::bitset<24> hello;
-  //
-  // for (size_t i = 31; i > 7; i--)
-  //   hello[i-8] = super_population[0][0][i];
-  //
-  // cout << endl;
-  // cout << hello << "\n" << super_population[0][0] << endl;
-
-  cout << "super_population 1: " << connections[0].weight << " = "<< super_population[0][0] << " = "<< bitset_to_float(super_population[0][0]) << endl;
-  debug_stop("h",2,false);
-  //Set gaussian noised chromosome as current
-  set_chromosome_as_weights(super_population[0]);
+  set_chromosome_as_weights(player_chromo);
 }
 
 int super_ludo_player::make_decision(){
