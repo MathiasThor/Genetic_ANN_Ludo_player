@@ -21,7 +21,12 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
   //Set gaussian noised chromosome as current
   //set_chromosome_as_weights(super_population[0]);
 
-  play_game(super_population[0]);
+  std::vector<int> wins = play_game(super_population[0]);
+
+  std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
+  std::cout << "Player 1 (Yellow) Won " << wins[1] << " games" << std::endl;
+  std::cout << "Player 2 (Blue)   Won " << wins[2] << " games" << std::endl;
+  std::cout << "Player 3 (Red)    Won " << wins[3] << " games" << std::endl;
 }
 
 bitset<32> genetic_algorithm::float_to_bitset(float input_float){
@@ -78,13 +83,14 @@ void genetic_algorithm::debug_stop(std::string action){
  std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
 }
 
-void genetic_algorithm::play_game(chromosome player_chromo){
+std::vector<int> genetic_algorithm::play_game(chromosome player_chromo){
   QApplication a(argc, argv);
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
-  ludo_player_random p1_green;
-  ludo_player_random p2_yellow;
+  // TODO FIX more than one RANDOM_PLAYER
+  ludo_player p1_green;
+  ludo_player p2_yellow;
   ludo_player_random p3_blue;
   super_ludo_player p4_red(player_chromo);
 
@@ -129,16 +135,8 @@ void genetic_algorithm::play_game(chromosome player_chromo){
       a.exec();
       g.reset();
   }
-
-  std::cout << "Player 0 (Green)  Won " << g.wins[0] << " games" << std::endl;
-  std::cout << "Player 1 (Yellow) Won " << g.wins[1] << " games" << std::endl;
-  std::cout << "Player 2 (Blue)   Won " << g.wins[2] << " games" << std::endl;
-  std::cout << "Player 3 (Red)    Won " << g.wins[3] << " games" << std::endl;
-
-  // p1_green.~ludo_player_random();
-  // p2_yellow.~ludo_player_random();
-  // p3_blue.~ludo_player_random();
-  // delete p4_red;
+  std::vector<int> v { g.wins[0], g.wins[1], g.wins[2], g.wins[3] };
+  return v;
 }
 
 // TODO: THE FOLLOWING I ABLE TO RESIZE

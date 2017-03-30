@@ -47,7 +47,7 @@ private:
 
 public:
     genetic_algorithm(int argc, char *argv[]);
-    void play_game(chromosome);
+    std::vector<int> play_game(chromosome);
 
 };
 
