@@ -32,6 +32,9 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
   // STOPPING CRITERION
   ////////////////////////////////
   // TODO manual, after X generations
+  // Save every generation
+    // Fitness data
+    // Chromosomes, so we can start from a point again
 
   // TODO:
   // Consider steady state: Child replaces worst parent if child is better Or
