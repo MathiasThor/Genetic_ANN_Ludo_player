@@ -21,6 +21,8 @@ SOURCES += main.cpp\
     super_ludo_player_record_games.cpp \
     super_ludo_player_utils.cpp \
     genetic_algorithm.cpp \
+    genetic_algorithm_utils.cpp \
+    genetic_algorithm_game.cpp \
     ludo_player_random.cpp
 
 HEADERS  += dialog.h \

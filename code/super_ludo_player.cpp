@@ -2,10 +2,11 @@
 
 using namespace std;
 
-super_ludo_player::super_ludo_player(chromosome player_chromo):
+super_ludo_player::super_ludo_player(chromosome player_chromo, float &fitness):
   pos_start_of_turn(16),
   pos_end_of_turn(16),
-  dice_roll(0)
+  dice_roll(0),
+  my_fitness(fitness)
 {
   net.create_from_file("./../../ann_code/ludo_player.net");
   set_chromosome_as_weights(player_chromo);
@@ -79,6 +80,7 @@ void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
     int decision = make_decision();
+    //calc_fitness();
     //int decision = record_my_games();
     emit select_piece(decision);
 }
@@ -90,6 +92,9 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
         if(pos_end_of_turn[i] < 99){
             game_complete = false;
         }
+    }
+    if (game_complete) {
+      calc_fitness();
     }
     emit turn_complete(game_complete);
 }

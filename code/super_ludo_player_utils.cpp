@@ -2,6 +2,11 @@
 
 using namespace std;
 
+void super_ludo_player::calc_fitness()
+{
+  my_fitness++;
+}
+
 float super_ludo_player::bitset_to_float(bitset<32> input_set){
   uint32_t const u = input_set.to_ullong();
   float d;

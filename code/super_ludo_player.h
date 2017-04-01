@@ -23,6 +23,7 @@ class super_ludo_player : public QObject {
 private:
     // CONSTANTS
     FANN::neural_net net;
+    float& my_fitness;
 
     // FUNCTIONS
     std::vector<int> pos_start_of_turn;
@@ -55,10 +56,11 @@ private:
     float bitset_to_float(std::bitset<32>);
     std::vector<int> sorted_index(fann_type*);
     void set_chromosome_as_weights( chromosome input_chromo);
+    void calc_fitness();
     union { float input; unsigned long long output;} data;
 
 public:
-    super_ludo_player(chromosome player_chromo);
+    super_ludo_player(chromosome player_chromo, float &fitness);
 signals:
     void select_piece(int);
     void turn_complete(bool);

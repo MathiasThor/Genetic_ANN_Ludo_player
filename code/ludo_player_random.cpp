@@ -10,17 +10,17 @@ ludo_player_random::ludo_player_random():
 }
 
 int ludo_player_random::make_decision(){
-    std::vector<int> valid_moves;
+    std::vector<int> valid_moves; // BUG - Causes double free
     if(dice_roll == 6){
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]<0){
-                valid_moves.push_back(i);
+                valid_moves.emplace_back(i);
             }
         }
     }
     for(int i = 0; i < 4; ++i){
         if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
-            valid_moves.push_back(i);
+            valid_moves.emplace_back(i);
         }
     }
     if(valid_moves.size()==0){

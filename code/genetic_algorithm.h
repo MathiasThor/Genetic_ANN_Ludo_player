@@ -45,9 +45,12 @@ private:
     void set_chromosome_as_weights( chromosome input_chromo);
     union { float input; unsigned long long output;} data;
 
+    void init_population();
+    void evaluation();
+
 public:
     genetic_algorithm(int argc, char *argv[]);
-    std::vector<int> play_game(chromosome);
+    std::vector<int> play_game(chromosome, float &fitness);
 
 };
 
