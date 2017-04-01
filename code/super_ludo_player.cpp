@@ -56,17 +56,17 @@ int super_ludo_player::make_decision(){
           std::cout << "*** ERROR ***" << std::endl;
           std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         } else {
-          cout << "- ";
+          //cout << "- ";
           // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
           return sorted_indexx[3];
         }
       } else {
-        cout << "+ ";
+        //cout << "+ ";
         // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         return sorted_indexx[2];
       }
     } else {
-      cout << "* ";
+      //cout << "* ";
       // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
       return sorted_indexx[1];
     }

@@ -26,13 +26,21 @@ Q_DECLARE_METATYPE( positions_and_dice )
 typedef std::vector< std::bitset<32> > chromosome;
 typedef std::vector< std::vector< std::bitset<32> > > population;
 
+struct chromo_eval {
+  int chromo_number;
+  float fitness;
+  bool operator<(const chromo_eval& a) const{
+      return fitness < a.fitness;
+  }
+} ;
+
 class genetic_algorithm {
 
 private:
     // CONSTANTS
     int argc;
     char **argv;
-    const int POP_SIZE = 10;
+    const int POP_SIZE = 20;
     FANN::neural_net net;
     population super_population;
 
@@ -46,7 +54,7 @@ private:
     union { float input; unsigned long long output;} data;
 
     void init_population();
-    void evaluation();
+    std::vector<chromo_eval> evaluation();
 
 public:
     genetic_algorithm(int argc, char *argv[]);

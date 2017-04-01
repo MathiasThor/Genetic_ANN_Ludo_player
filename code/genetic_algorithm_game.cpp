@@ -48,11 +48,19 @@ std::vector<int> genetic_algorithm::play_game(chromosome player_chromo, float &f
   QObject::connect(&g, SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
   QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
-  for(int i = 0; i < 1000; ++i){
+  // g.start();
+  // a.exec();
+
+  for(int i = 0; i < 60; ++i){
+      //std::cout << 1 << std::flush;
       g.start();
+      //std::cout << 2 << std::flush;
       a.exec();
+      //std::cout << 3 << std::flush;
       g.reset();
+      //std::cout << 4 << std::flush;
   }
+
   std::vector<int> v { g.wins[0], g.wins[1], g.wins[2], g.wins[3] };
   return v;
 }
