@@ -13,13 +13,29 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
   ////////////////////////////////
   // EVALUATION BUG (Dbus thing)
   ////////////////////////////////
-  for (size_t i = 0; i < 100; i++) {
-    cout << "\n\nRun " << i << endl;
-    std::vector<chromo_eval> evaluation_list = evaluation();
-    for (size_t i = 0; i < evaluation_list.size(); i++)
-      cout << "Chromo: " << evaluation_list[i].chromo_number << "\tWith fitness: " << evaluation_list[i].fitness << endl;
-  }
+  std::vector<chromo_eval> evaluation_list = evaluation();
 
+  ////////////////////////////////
+  // SELECTION
+  ////////////////////////////////
+  // TODO - Maybe simply roulette - Solution on slide
+  // Turnament seems simple as well.
+
+  ////////////////////////////////
+  // Recombination
+  ////////////////////////////////
+  // TODO Crossover - Every 2nd weight is from parent 1 and visa versa
+  // TODO Mutation - Flip Bit
+  // Set crossover & mutation rates
+
+  ////////////////////////////////
+  // STOPPING CRITERION
+  ////////////////////////////////
+  // TODO manual, after X generations
+
+  // TODO:
+  // Consider steady state: Child replaces worst parent if child is better Or
+  // Elitism: generational, but best n parents survive
 
 
   // float fitness = 0;
