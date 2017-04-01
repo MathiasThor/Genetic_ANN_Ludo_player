@@ -19,37 +19,28 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
   // SELECTION
   ////////////////////////////////
   // TODO - Maybe simply roulette - Solution on slide
-  // Turnament seems simple as well.
+  // TODO - Turnament seems simple as well.
 
   ////////////////////////////////
   // Recombination
   ////////////////////////////////
   // TODO Crossover - Every 2nd weight is from parent 1 and visa versa
   // TODO Mutation - Flip Bit
-  // Set crossover & mutation rates
+  // TODO Set crossover & mutation rates
+
+  // TODO Consider steady state: Child replaces worst parent if child is better Or
+  // TODO Elitism: generational, but best n parents survive
 
   ////////////////////////////////
   // STOPPING CRITERION
   ////////////////////////////////
   // TODO manual, after X generations
-  // Save every generation
-    // Fitness data
-    // Chromosomes, so we can start from a point again
-
-  // TODO:
-  // Consider steady state: Child replaces worst parent if child is better Or
-  // Elitism: generational, but best n parents survive
+  // TODO Save every generation
+    // TODO Fitness data
+    // TODO Chromosomes, so we can start from a point again
 
 
-  // float fitness = 0;
-  // std::vector<int> wins = play_game(super_population[0], fitness);
-  //
-  // cout << "\nfitness out: "<< fitness << endl << endl;
-  //
-  // std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
-  // std::cout << "Player 1 (Yellow) Won " << wins[1] << " games" << std::endl;
-  // std::cout << "Player 2 (Blue)   Won " << wins[2] << " games" << std::endl;
-  // std::cout << "Player 3 (Red)    Won " << wins[3] << " games" << std::endl;
+  cout << "GENETIC ALGORITHM FINISHED!" << endl;
 }
 
 void genetic_algorithm::init_population(){
@@ -83,3 +74,8 @@ vector<chromo_eval> genetic_algorithm::evaluation(){
   sort(evaluation_list.begin(), evaluation_list.end()); // TODO FIX THIS
   return evaluation_list;
 }
+
+// std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
+// std::cout << "Player 1 (Yellow) Won " << wins[1] << " games" << std::endl;
+// std::cout << "Player 2 (Blue)   Won " << wins[2] << " games" << std::endl;
+// std::cout << "Player 3 (Red)    Won " << wins[3] << " games" << std::endl;
