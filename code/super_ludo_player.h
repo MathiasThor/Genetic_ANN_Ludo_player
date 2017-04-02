@@ -23,7 +23,8 @@ class super_ludo_player : public QObject {
 private:
     // CONSTANTS
     FANN::neural_net net;
-    float& my_fitness;
+    float* my_fitness;
+    bool calculate_fitness;
 
     // FUNCTIONS
     std::vector<int> pos_start_of_turn;
@@ -60,7 +61,9 @@ private:
     union { float input; unsigned long long output;} data;
 
 public:
-    super_ludo_player(chromosome player_chromo, float &fitness);
+    super_ludo_player(chromosome player_chromo, float *fitness);
+    super_ludo_player(chromosome player_chromo);
+    ~super_ludo_player();
 signals:
     void select_piece(int);
     void turn_complete(bool);

@@ -4,7 +4,7 @@ using namespace std;
 
 void super_ludo_player::calc_fitness()
 {
-  my_fitness++;
+  *my_fitness = *my_fitness+1;
 }
 
 float super_ludo_player::bitset_to_float(bitset<32> input_set){
@@ -44,14 +44,14 @@ void super_ludo_player::debug_stop(std::string action, int pos, bool cout_positi
 }
 
 std::vector < int > super_ludo_player::sorted_index(fann_type* calc_out){
-  double fourth_largest = 0;
+  double fourth_largest = 90;
   double third_largest = 0;
   double second_largest = 0;
   double largest = 0;
-  int fourth_largest_index = -1;
-  int third_largest_index = -1;
-  int second_largest_index = -1;
-  int largest_index = -1;
+  int fourth_largest_index = -99;
+  int third_largest_index = -99;
+  int second_largest_index = -99;
+  int largest_index = -99;
   //Finding Largest
   for (int i = 0; i < 4; ++i)
     if (calc_out[i]>largest){
@@ -75,13 +75,12 @@ std::vector < int > super_ludo_player::sorted_index(fann_type* calc_out){
       third_largest_index = i;
    }
   //finding fourth largset
-  for (int i = 0; i < 4; ++i)
-   if (calc_out[i]>third_largest){
-      if (calc_out[i] == largest || calc_out[i] == second_largest || calc_out[i] == third_largest)
-            continue;
+  for (int i = 0; i < 4; ++i){
+    if ( calc_out[i] < fourth_largest ){
       fourth_largest = calc_out[i];
       fourth_largest_index = i;
-   }
+    }
+  }
 
    return vector<int>{largest_index,second_largest_index,third_largest_index,fourth_largest_index};
 }

@@ -2,24 +2,44 @@
 
 using namespace std;
 
-super_ludo_player::super_ludo_player(chromosome player_chromo, float &fitness):
+super_ludo_player::super_ludo_player(chromosome player_chromo, float *fitness):
   pos_start_of_turn(16),
   pos_end_of_turn(16),
-  dice_roll(0),
-  my_fitness(fitness)
+  dice_roll(0)
 {
+  my_fitness = fitness;
+  calculate_fitness = true;
   net.create_from_file("./../../ann_code/ludo_player.net");
   set_chromosome_as_weights(player_chromo);
 }
 
+super_ludo_player::super_ludo_player(chromosome player_chromo):
+  pos_start_of_turn(16),
+  pos_end_of_turn(16),
+  dice_roll(0)
+{
+  my_fitness = NULL;
+  calculate_fitness = false;
+  net.create_from_file("./../../ann_code/ludo_player.net");
+  set_chromosome_as_weights(player_chromo);
+}
+
+super_ludo_player::~super_ludo_player()
+{
+  //delete[] my_fitness;
+  //my_fitness = 0;
+  net.destroy();
+}
+
 int super_ludo_player::make_decision(){
+
 
   if (dice_roll != 6 &&
     (pos_start_of_turn[0] == -1 || pos_start_of_turn[0] == 99) &&
     (pos_start_of_turn[1] == -1 || pos_start_of_turn[1] == 99) &&
     (pos_start_of_turn[2] == -1 || pos_start_of_turn[2] == 99) &&
     (pos_start_of_turn[3] == -1 || pos_start_of_turn[3] == 99)) {
-    return -1;
+    return 1;
   }
 
   fann_type *calc_out;
@@ -47,8 +67,6 @@ int super_ludo_player::make_decision(){
 
   vector<int> sorted_indexx = sorted_index(calc_out);
 
-  //net.destroy();
-
   if ( !can_move(pos_start_of_turn[sorted_indexx[0]], dice_roll) ){
     if ( !can_move(pos_start_of_turn[sorted_indexx[1]], dice_roll) ) {
       if ( !can_move(pos_start_of_turn[sorted_indexx[2]], dice_roll) ) {
@@ -57,23 +75,22 @@ int super_ludo_player::make_decision(){
           std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         } else {
           //cout << "- ";
-          // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
           return sorted_indexx[3];
         }
       } else {
         //cout << "+ ";
-        // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         return sorted_indexx[2];
       }
     } else {
       //cout << "* ";
-      // std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
       return sorted_indexx[1];
     }
   } else {
     return sorted_indexx[0];
   }
 
+  debug_stop("ERROR", 99, false);
+  return 1;
 }
 
 void super_ludo_player::start_turn(positions_and_dice relative){
@@ -94,7 +111,8 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
         }
     }
     if (game_complete) {
-      calc_fitness();
+      if(calculate_fitness)
+        calc_fitness();
     }
     emit turn_complete(game_complete);
 }

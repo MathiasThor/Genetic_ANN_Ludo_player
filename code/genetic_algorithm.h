@@ -20,6 +20,7 @@
 #include "ludo_player.h"
 #include "super_ludo_player.h"
 #include "ludo_player_random.h"
+#include <algorithm>
 
 Q_DECLARE_METATYPE( positions_and_dice )
 
@@ -55,10 +56,12 @@ private:
 
     void init_population();
     std::vector<chromo_eval> evaluation();
+    int play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo);
+    std::vector<int> selection_turnament();
 
 public:
     genetic_algorithm(int argc, char *argv[]);
-    std::vector<int> play_game(chromosome, float &fitness);
+    std::vector<int> play_game(chromosome, float *fitness);
 
 };
 

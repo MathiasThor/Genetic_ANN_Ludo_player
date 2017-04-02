@@ -14,12 +14,15 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
   // EVALUATION BUG (Dbus thing)
   ////////////////////////////////
   std::vector<chromo_eval> evaluation_list = evaluation();
+  // for (size_t i = 0; i < evaluation_list.size(); i++)
+  //   cout << "Fitness: " << evaluation_list[i].fitness << endl;
 
   ////////////////////////////////
   // SELECTION
   ////////////////////////////////
-  // TODO - Maybe simply roulette - Solution on slide
-  // TODO - Turnament seems simple as well.
+  std::vector<int> two_parents = selection_turnament();
+  cout << "parent 1: " << two_parents[0] << endl;
+  cout << "parent 2: " << two_parents[1] << endl;
 
   ////////////////////////////////
   // Recombination
@@ -28,6 +31,9 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
   // TODO Mutation - Flip Bit
   // TODO Set crossover & mutation rates
 
+  ////////////////////////////////
+  // Replacement
+  ////////////////////////////////
   // TODO Consider steady state: Child replaces worst parent if child is better Or
   // TODO Elitism: generational, but best n parents survive
 
@@ -55,16 +61,18 @@ void genetic_algorithm::init_population(){
 }
 
 vector<chromo_eval> genetic_algorithm::evaluation(){
+  cout << "Evaluating Population"<< flush;
+
   vector<chromo_eval> evaluation_list;
   float fitness = 0;
+  float *fitness_pointer = &fitness;
   chromo_eval tmp_chromo_eval;
-  cout << "Evaluating Population"<< flush;
   for (int i = 0; i < super_population.size(); i++) {
     cout << "." << flush;
     fitness = 0;
 
     //for (size_t k = 0; k < 100; k++)
-    play_game(super_population[i], fitness);
+    play_game(super_population[i], fitness_pointer);
 
     tmp_chromo_eval.chromo_number = i;
     tmp_chromo_eval.fitness = fitness;
@@ -74,6 +82,39 @@ vector<chromo_eval> genetic_algorithm::evaluation(){
   sort(evaluation_list.begin(), evaluation_list.end()); // TODO FIX THIS
   return evaluation_list;
 }
+
+std::vector<int> genetic_algorithm::selection_turnament(){
+  cout << "Turnament Time!" << endl;
+
+  std::vector<int> two_parents;
+  std::random_device seeder;
+  std::mt19937 rng(seeder());
+  std::uniform_int_distribution<int> gen(0, super_population.size()-1);
+  std::vector<int> rng_list;
+  int random_num;
+  for (int i = 0; i < 4; i++) {
+    while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end())
+      random_num = gen(rng);
+    rng_list.push_back(random_num);
+  }
+
+  int parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
+  two_parents.push_back(rng_list[parent]);
+
+  rng_list.clear();
+
+  for (int i = 0; i < 4; i++) {
+    while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end() || random_num == rng_list[parent])
+      random_num = gen(rng);
+    rng_list.push_back(random_num);
+  }
+
+  parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
+  two_parents.push_back(rng_list[parent]);
+
+  return two_parents;
+}
+
 
 // std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
 // std::cout << "Player 1 (Yellow) Won " << wins[1] << " games" << std::endl;
