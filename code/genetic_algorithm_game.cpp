@@ -7,9 +7,9 @@ std::vector<int> genetic_algorithm::play_game(chromosome player_chromo, float *f
 
   //instanciate the players here
   // TODO FIX more than one RANDOM_PLAYER
-  ludo_player p1_green;
-  ludo_player p2_yellow;
-  ludo_player p3_blue;
+  ludo_player_random p1_green;
+  ludo_player_random p2_yellow;
+  ludo_player_random p3_blue;
   super_ludo_player p4_red(player_chromo, fitness);
 
   game g;
