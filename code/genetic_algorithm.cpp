@@ -1,39 +1,76 @@
 #include "genetic_algorithm.h"
 using namespace std;
 
-genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[]){
+genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load_this_population){
   argc = new_argc;
   argv = new_argv;
+  int generation = 1;
+  string filename = "error";
+  population new_generation;
+  std::vector<chromo_eval> evaluation_list;
+  std::vector<chromosome> crossover_offsprings;
+  std::vector<int> two_parents;
 
   ////////////////////////////////
   // INIT POPULATION W. GAUSSIAN
   ////////////////////////////////
-  init_population();
+  cout << "\n##\nGENERATION " << generation << "\n##" << endl;
+  if (load_this_population == "NO") {
+    init_population();
+  } else{
+    super_population = load_generation(load_this_population);
+  }
+
 
   ////////////////////////////////
   // EVALUATION BUG (Dbus thing)
   ////////////////////////////////
-  std::vector<chromo_eval> evaluation_list = evaluation();
-  // for (size_t i = 0; i < evaluation_list.size(); i++)
-  //   cout << "Fitness: " << evaluation_list[i].fitness << endl;
+  for (size_t i = 0; i < 20; i++) {
+    evaluation_list = evaluation();
+    cout << "Lowest  fitness: " << evaluation_list[0].fitness << endl;
+    cout << "Largest fitness: " << evaluation_list[evaluation_list.size()-1].fitness << endl;
+    // for (size_t i = 0; i < evaluation_list.size(); i++)
+    //   cout << "Fitness: " << evaluation_list[i].fitness << endl;
 
   ////////////////////////////////
   // SELECTION
   ////////////////////////////////
-  std::vector<int> two_parents = selection_turnament();
-  cout << "parent 1: " << two_parents[0] << endl;
-  cout << "parent 2: " << two_parents[1] << endl;
+    new_generation.clear();
+    cout << "Selection and Replacement" << flush;
+    for (int i = 0; i < POP_SIZE/2; i++) {
+      two_parents = selection_turnament();
+      // cout << "parent 1: " << two_parents[0] << endl;
+      // cout << "parent 2: " << two_parents[1] << endl;
 
   ////////////////////////////////
-  // Recombination
+  // RECOMBINATION
   ////////////////////////////////
-  // TODO Crossover - Every 2nd weight is from parent 1 and visa versa
-  // TODO Mutation - Flip Bit
-  // TODO Set crossover & mutation rates
+      // TODO crossover & mutation rates!
+      crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[0]]);
+      new_generation.push_back(mutation(crossover_offsprings[0]));
+      new_generation.push_back(mutation(crossover_offsprings[1]));
+      //new_generation.push_back(mutation(super_population[two_parents[0]]));
+      //new_generation.push_back(mutation(super_population[two_parents[1]]));
+      cout << "." << flush;
+    }
+    cout << endl;
+    std::cout << "New Pop size: " << new_generation.size() <<   " and "<< new_generation[1].size()   <<'\n';
+    std::cout << "Old Pop size: " << super_population.size() << " and "<< super_population[1].size() << '\n';
 
   ////////////////////////////////
-  // Replacement
+  // REPLACEMENT
   ////////////////////////////////
+    //super_population.clear();
+    super_population = new_generation;
+    generation++;
+    cout << "\n##\nGENERATION " << generation << "\n##" << endl;
+    if (generation%5 == 0) {
+      filename = "./generation_data/generation_"+to_string(generation)+".bin";
+      save_generation(super_population, filename);
+    }
+  }
+
+  // TODO Now it is generational
   // TODO Consider steady state: Child replaces worst parent if child is better Or
   // TODO Elitism: generational, but best n parents survive
 
@@ -79,12 +116,13 @@ vector<chromo_eval> genetic_algorithm::evaluation(){
     evaluation_list.push_back(tmp_chromo_eval);
   }
   cout << endl;
-  sort(evaluation_list.begin(), evaluation_list.end()); // TODO FIX THIS
+  sort(evaluation_list.begin(), evaluation_list.end());
+
   return evaluation_list;
 }
 
 std::vector<int> genetic_algorithm::selection_turnament(){
-  cout << "Turnament Time!" << endl;
+  //cout << "Turnament Time!" << endl;
 
   std::vector<int> two_parents;
   std::random_device seeder;
@@ -115,6 +153,72 @@ std::vector<int> genetic_algorithm::selection_turnament(){
   return two_parents;
 }
 
+std::vector<chromosome> genetic_algorithm::crossover(chromosome parent1, chromosome parent2){
+  chromosome offspring_12, offspring_21;
+
+  /* In this way we split it up for each weight */
+  /* It may need to be more advanced, like an mask */
+  for (int i = 0; i < parent1.size(); i+=2) {
+    offspring_12.push_back(parent1[i]);
+    offspring_12.push_back(parent2[i+1]);
+    offspring_21.push_back(parent2[i]);
+    offspring_21.push_back(parent1[i+1]);
+  }
+
+  std::vector<chromosome> v{offspring_12, offspring_21};
+  return v;
+}
+
+chromosome genetic_algorithm::mutation(chromosome parent){
+
+  // TODO Make the chance for mutation inverse propertional to the MAX fitness
+  float chance_of_mutation = 0.5;
+
+  std::random_device seeder;
+  std::mt19937 rng(seeder());
+  std::uniform_real_distribution<double> gen(0.0, 1.0);
+  std::uniform_real_distribution<double> gen2(-2.0, +2.0);
+
+  // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.progcomc/single_pre_float.htm
+  // We only alter the fraction
+  for (int i = 0; i < parent[i].size(); i++) {
+    for (int j = 31; j < 9; j--) { // DOES NOT INCLUDE THE SIGN
+      if (gen(rng) > chance_of_mutation) {
+        parent[i].flip(j);
+      }
+    }
+  }
+
+  return parent;
+}
+
+void genetic_algorithm::save_generation(population pop_to_save, string filename){
+  std::ofstream file(filename, std::ofstream::binary);
+  unsigned long n;
+  for(size_t i = 0; i < pop_to_save.size(); i++ ) {
+    for (size_t j = 0; j < pop_to_save[i].size(); j++) {
+      n = pop_to_save[i][j].to_ulong();
+      file.write(reinterpret_cast<const char*>(&n), sizeof(n));
+    }
+  }
+
+  std::cout << "Saved population to: " << filename << '\n';
+}
+
+population genetic_algorithm::load_generation(string filename){
+  std::ifstream file(filename, std::ofstream::binary);
+  population loaded_pop (20, std::vector<bitset<32>> (394,0));
+  unsigned long n;
+  for(size_t i = 0; i < 20; i++ ) {
+    for (size_t j = 0; j < 394; j++) {
+      file.read( reinterpret_cast<char*>(&n), sizeof(n) );
+      loaded_pop[i][j] = n;
+    }
+  }
+
+  std::cout << "Loaded population from: " << filename << '\n';
+  return loaded_pop;
+}
 
 // std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
 // std::cout << "Player 1 (Yellow) Won " << wins[1] << " games" << std::endl;

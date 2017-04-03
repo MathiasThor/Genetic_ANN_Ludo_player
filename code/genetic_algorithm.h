@@ -8,6 +8,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <vector>
+#include <string>
 #include "floatfann.h"
 #include "fann_cpp.h"
 #include "positions_and_dice.h"
@@ -54,13 +55,19 @@ private:
     void set_chromosome_as_weights( chromosome input_chromo);
     union { float input; unsigned long long output;} data;
 
+    int play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo);
+
+    void save_generation(population pop_to_save, std::string filename);
+    population load_generation(std::string filename);
+
     void init_population();
     std::vector<chromo_eval> evaluation();
-    int play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo);
     std::vector<int> selection_turnament();
+    std::vector<chromosome> crossover(chromosome parent1, chromosome parent2);
+    chromosome mutation(chromosome parent);
 
 public:
-    genetic_algorithm(int argc, char *argv[]);
+    genetic_algorithm(int argc, char *argv[], std::string load="NO");
     std::vector<int> play_game(chromosome, float *fitness);
 
 };
