@@ -4,7 +4,39 @@ using namespace std;
 
 void super_ludo_player::calc_fitness()
 {
-  *my_fitness = *my_fitness+1;
+  // TODO Number of kills?
+
+  // Distance to goal
+  int own_total_dist_from_start = 0;
+  for (size_t i = 0; i < 4; i++) {
+    if (pos_start_of_turn[i] == 99)
+      own_total_dist_from_start += 57;
+    else if (pos_start_of_turn[i] == -1)
+      own_total_dist_from_start += 0;
+    else own_total_dist_from_start += pos_start_of_turn[i];
+  }
+
+  // TODO Death's
+
+  // Numbers of players in goal
+  int own_player_in_goal = 0;
+  for (size_t i = 0; i < 4; i++) {
+    if (pos_start_of_turn[i] == 99)
+      own_player_in_goal++;
+  }
+  // TODO Enemy dist to goal
+
+  // TODO Enemy players in goal
+  int enemy_player_in_goal = 0;
+  for (size_t i = 4; i < pos_start_of_turn.size(); i++) {
+    if (pos_start_of_turn[i] == 99)
+      enemy_player_in_goal++;
+  }
+
+  *my_fitness = own_player_in_goal;
+                 //own_total_dist_from_start +
+                 //own_player_in_goal*2 -
+                 //enemy_player_in_goal*5;
 }
 
 float super_ludo_player::bitset_to_float(bitset<32> input_set){

@@ -26,13 +26,10 @@ super_ludo_player::super_ludo_player(chromosome player_chromo):
 
 super_ludo_player::~super_ludo_player()
 {
-  //delete[] my_fitness;
-  //my_fitness = 0;
   net.destroy();
 }
 
 int super_ludo_player::make_decision(){
-
 
   if (dice_roll != 6 &&
     (pos_start_of_turn[0] == -1 || pos_start_of_turn[0] == 99) &&
@@ -71,8 +68,8 @@ int super_ludo_player::make_decision(){
     if ( !can_move(pos_start_of_turn[sorted_indexx[1]], dice_roll) ) {
       if ( !can_move(pos_start_of_turn[sorted_indexx[2]], dice_roll) ) {
         if ( !can_move(pos_start_of_turn[sorted_indexx[3]], dice_roll) ) {
-          std::cout << "*** ERROR ***" << std::endl;
-          std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
+          //std::cout << "E";
+          //std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         } else {
           //cout << "- ";
           return sorted_indexx[3];
@@ -89,7 +86,7 @@ int super_ludo_player::make_decision(){
     return sorted_indexx[0];
   }
 
-  debug_stop("ERROR", 99, false);
+  //debug_stop("ERROR", 99, false);
   return 1;
 }
 
@@ -97,7 +94,8 @@ void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
     int decision = make_decision();
-    //calc_fitness();
+    if(calculate_fitness)
+      calc_fitness();
     //int decision = record_my_games();
     emit select_piece(decision);
 }
@@ -110,14 +108,8 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
             game_complete = false;
         }
     }
-    if (game_complete) {
-      if(calculate_fitness)
-        calc_fitness();
-    }
+
     emit turn_complete(game_complete);
 }
 
-
-// Will stacked players hit home people from own team? NO - SEE "send_them_home"
 // fitness function: f = WINNER*? + players_home*? + leftover_distance*?
-// Neural network, to train after my play style

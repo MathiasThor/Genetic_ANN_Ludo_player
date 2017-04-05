@@ -30,9 +30,10 @@ typedef std::vector< std::vector< std::bitset<32> > > population;
 
 struct chromo_eval {
   int chromo_number;
+  int wins;
   float fitness;
   bool operator<(const chromo_eval& a) const{
-      return fitness < a.fitness;
+      return wins < a.wins;
   }
 } ;
 
@@ -42,8 +43,19 @@ private:
     // CONSTANTS
     int argc;
     char **argv;
-    const int POP_SIZE = 20;
+
+    const int POP_SIZE             = 32;  // Only Even Numbers
+    const int PLAY_TIMES_EVAL      = 50;
+    const int PLAY_TIMES_TURNAMENT = 20;
+    const float GAUSSIAN_STDDEV    = 5.0;
+    const float CROSSOVER_RATE     = 0.65;
+    const float MUTATION_RATE      = 0.65;
+    const float MUTATION_PROB      = 0.75;
     FANN::neural_net net;
+
+    std::random_device seeder;
+    std::mt19937 rng;
+
     population super_population;
 
     // FUNCTIONS
@@ -61,14 +73,14 @@ private:
     population load_generation(std::string filename);
 
     void init_population();
-    std::vector<chromo_eval> evaluation();
-    std::vector<int> selection_turnament();
+    std::vector<chromo_eval> evaluation(population);
+    std::vector<int> selection_turnament(std::vector<chromo_eval>);
     std::vector<chromosome> crossover(chromosome parent1, chromosome parent2);
     chromosome mutation(chromosome parent);
 
 public:
     genetic_algorithm(int argc, char *argv[], std::string load="NO");
-    std::vector<int> play_game(chromosome, float *fitness);
+    int play_game(chromosome, float *fitness);
 
 };
 

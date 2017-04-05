@@ -1,36 +1,66 @@
 #include "genetic_algorithm.h"
 using namespace std;
 
-genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load_this_population){
+genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load_this_population):
+  seeder(),
+  rng(seeder())
+  {
   argc = new_argc;
   argv = new_argv;
   int generation = 1;
   string filename = "error";
   population new_generation;
-  std::vector<chromo_eval> evaluation_list;
+  std::vector<chromo_eval> evaluation_list_current;
+  std::vector<chromo_eval> evaluation_list_nxtgn;
   std::vector<chromosome> crossover_offsprings;
   std::vector<int> two_parents;
+  std::uniform_real_distribution<double> gen(0.0, 1.0);
+  float sum = 0;
+
+  cout << "\nStarting Genetic Ludo Algorithm" << endl;
+  cout << "-------------------------------" << endl;
+  cout << "Gaussian std_dev:    \t" << GAUSSIAN_STDDEV << endl;
+  cout << "Crossover Rate:      \t" << CROSSOVER_RATE << endl;
+  cout << "Mutation Rate:       \t" << MUTATION_RATE << endl;
+  cout << "Mutation Probability:\t" << MUTATION_PROB << endl;
+  cout << "Games pr. evaluation:\t" << PLAY_TIMES_EVAL << endl;
+  cout << "Games pr. turnament: \t" << PLAY_TIMES_TURNAMENT << endl;
+  cout << "Population size:     \t" << POP_SIZE << endl;
+  cout << "-------------------------------\n" << endl;
 
   ////////////////////////////////
   // INIT POPULATION W. GAUSSIAN
   ////////////////////////////////
-  cout << "\n##\nGENERATION " << generation << "\n##" << endl;
+
   if (load_this_population == "NO") {
     init_population();
   } else{
-    super_population = load_generation(load_this_population);
+    unsigned first = load_this_population.find("_");
+    unsigned last = load_this_population.find(".");
+    string strNew = load_this_population.substr (first+1,last-first-1);
+    super_population = load_generation("./generation_data/"+load_this_population);
+    generation = atoi(strNew.c_str()) + 1;
   }
+  cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
 
 
   ////////////////////////////////
   // EVALUATION BUG (Dbus thing)
   ////////////////////////////////
-  for (size_t i = 0; i < 20; i++) {
-    evaluation_list = evaluation();
-    cout << "Lowest  fitness: " << evaluation_list[0].fitness << endl;
-    cout << "Largest fitness: " << evaluation_list[evaluation_list.size()-1].fitness << endl;
-    // for (size_t i = 0; i < evaluation_list.size(); i++)
-    //   cout << "Fitness: " << evaluation_list[i].fitness << endl;
+  for (size_t i = 0; i < 10000; i++) {
+    evaluation_list_current = evaluation(super_population);
+
+    sum = 0;
+    for (size_t i = 0; i < evaluation_list_current.size(); i++)
+      sum += evaluation_list_current[i].wins;
+
+    cout << "Lowest  fitness: " << evaluation_list_current[0].wins << endl;
+    cout << "Largest fitness: " << evaluation_list_current[evaluation_list_current.size()-1].wins << endl;
+    cout << "Avg.    fitness: " << sum/evaluation_list_current.size() << endl;
+    for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
+      cout << "Wins: " << evaluation_list_current[i].wins << "  ";
+      cout << "Wins: " << evaluation_list_current[i+evaluation_list_current.size()/2].wins << endl;
+    }
 
   ////////////////////////////////
   // SELECTION
@@ -38,32 +68,65 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
     new_generation.clear();
     cout << "Selection and Replacement" << flush;
     for (int i = 0; i < POP_SIZE/2; i++) {
-      two_parents = selection_turnament();
+      two_parents = selection_turnament(evaluation_list_current);
       // cout << "parent 1: " << two_parents[0] << endl;
       // cout << "parent 2: " << two_parents[1] << endl;
 
   ////////////////////////////////
   // RECOMBINATION
   ////////////////////////////////
-      // TODO crossover & mutation rates!
-      crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[0]]);
-      new_generation.push_back(mutation(crossover_offsprings[0]));
-      new_generation.push_back(mutation(crossover_offsprings[1]));
-      //new_generation.push_back(mutation(super_population[two_parents[0]]));
-      //new_generation.push_back(mutation(super_population[two_parents[1]]));
+      if (gen(rng) < CROSSOVER_RATE) {
+        crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[1]]);
+      }
+      else {
+        crossover_offsprings.push_back(super_population[two_parents[0]]);
+        crossover_offsprings.push_back(super_population[two_parents[1]]);
+      }
+
+      if (gen(rng) < MUTATION_RATE) {
+        new_generation.push_back(mutation(crossover_offsprings[0]));
+        new_generation.push_back(mutation(crossover_offsprings[1]));
+      }
+      else {
+        new_generation.push_back(crossover_offsprings[0]);
+        new_generation.push_back(crossover_offsprings[1]);
+      }
+
+      // for (size_t i = 0; i < new_generation[0][0].size(); i++) {
+      //   std::cout << "Mutated: " << bitset_to_float(new_generation[0][i]) << '\n';
+      //   std::cout << "Cleaned: " << bitset_to_float(super_population[0][i]) << '\n';
+      // }
       cout << "." << flush;
     }
     cout << endl;
-    std::cout << "New Pop size: " << new_generation.size() <<   " and "<< new_generation[1].size()   <<'\n';
-    std::cout << "Old Pop size: " << super_population.size() << " and "<< super_population[1].size() << '\n';
 
   ////////////////////////////////
   // REPLACEMENT
   ////////////////////////////////
-    //super_population.clear();
     super_population = new_generation;
+
+    // evaluation_list_nxtgn = evaluation(new_generation);
+    // for (size_t i = 0; i < evaluation_list_nxtgn.size()/2; i++) {
+    //   super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
+    // }
+
+    // evaluation_list_nxtgn = evaluation(new_generation);
+    // // TODO SWAP THE WORST FIRST, NOT THE BEST
+    // for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
+    //   for (size_t j = evaluation_list_current.size()-1; j > 0; j--) {
+    //     if (evaluation_list_nxtgn[i].fitness > evaluation_list_current[j].fitness) {
+    //       cout << "\nSwapped:" << endl;
+    //       cout << "Nxtgn: "<< evaluation_list_nxtgn[i].chromo_number << " Fitness: "   << evaluation_list_nxtgn[i].fitness << endl;
+    //       cout << "Curre: "<< evaluation_list_current[j].chromo_number << " Fitness: " << evaluation_list_current[j].fitness << endl;
+    //       super_population[evaluation_list_current[j].chromo_number] = new_generation[evaluation_list_nxtgn[i].chromo_number];
+    //       evaluation_list_current[j].fitness = evaluation_list_nxtgn[i].fitness;
+    //       break;
+    //     }
+    //   }
+    // }
+
     generation++;
-    cout << "\n##\nGENERATION " << generation << "\n##" << endl;
+    cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
     if (generation%5 == 0) {
       filename = "./generation_data/generation_"+to_string(generation)+".bin";
       save_generation(super_population, filename);
@@ -95,22 +158,27 @@ void genetic_algorithm::init_population(){
   super_population.push_back( get_chromosome( connections, num_connections) );
   for (size_t i = 1; i < POP_SIZE; i++)
     super_population.push_back( add_gaussian_noise_to_chromosome( super_population[0]) );
+
+  super_population[0] = add_gaussian_noise_to_chromosome(super_population[0]);
 }
 
-vector<chromo_eval> genetic_algorithm::evaluation(){
+vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
   cout << "Evaluating Population"<< flush;
 
   vector<chromo_eval> evaluation_list;
   float fitness = 0;
+  int wins = 0;
   float *fitness_pointer = &fitness;
   chromo_eval tmp_chromo_eval;
-  for (int i = 0; i < super_population.size(); i++) {
+  for (int i = 0; i < input_pop.size(); i++) {
     cout << "." << flush;
     fitness = 0;
+    wins = 0;
 
-    //for (size_t k = 0; k < 100; k++)
-    play_game(super_population[i], fitness_pointer);
+    for (int j = 0; j < PLAY_TIMES_EVAL; j++)
+      wins += play_game(input_pop[i], fitness_pointer);
 
+    tmp_chromo_eval.wins = wins;
     tmp_chromo_eval.chromo_number = i;
     tmp_chromo_eval.fitness = fitness;
     evaluation_list.push_back(tmp_chromo_eval);
@@ -121,25 +189,40 @@ vector<chromo_eval> genetic_algorithm::evaluation(){
   return evaluation_list;
 }
 
-std::vector<int> genetic_algorithm::selection_turnament(){
-  //cout << "Turnament Time!" << endl;
-
+std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval> eval_list){
+  // TODO TURNAMENT WITH BEST 50%
+  int parent;
+  std::vector<int> winnings(4,0);
   std::vector<int> two_parents;
   std::random_device seeder;
   std::mt19937 rng(seeder());
   std::uniform_int_distribution<int> gen(0, super_population.size()-1);
   std::vector<int> rng_list;
   int random_num;
+
   for (int i = 0; i < 4; i++) {
     while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end())
       random_num = gen(rng);
     rng_list.push_back(random_num);
   }
+  for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
+    parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
+    winnings[parent] += 1;
+  }
 
-  int parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
-  two_parents.push_back(rng_list[parent]);
+  int largest = 0;
+  int largest_index = 0;
+  for(int i = 0; i < winnings.size(); i++)
+  {
+      if( winnings[i] > largest ){
+        largest=winnings[i];
+        largest_index = i;
+      }
+  }
 
+  two_parents.push_back(rng_list[largest_index]);
   rng_list.clear();
+  winnings.clear();
 
   for (int i = 0; i < 4; i++) {
     while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end() || random_num == rng_list[parent])
@@ -147,8 +230,23 @@ std::vector<int> genetic_algorithm::selection_turnament(){
     rng_list.push_back(random_num);
   }
 
-  parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
-  two_parents.push_back(rng_list[parent]);
+  for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
+    parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
+    winnings[parent] += 1;
+  }
+
+  largest = 0;
+  largest_index = 0;
+  for(int i = 0; i < winnings.size(); i++)
+  {
+      if( winnings[i] > largest ){
+        largest=winnings[i];
+        largest_index = i;
+      }
+  }
+
+  two_parents.push_back(rng_list[largest_index]);
+  rng_list.clear();
 
   return two_parents;
 }
@@ -170,54 +268,18 @@ std::vector<chromosome> genetic_algorithm::crossover(chromosome parent1, chromos
 }
 
 chromosome genetic_algorithm::mutation(chromosome parent){
-
-  // TODO Make the chance for mutation inverse propertional to the MAX fitness
-  float chance_of_mutation = 0.5;
-
-  std::random_device seeder;
-  std::mt19937 rng(seeder());
-  std::uniform_real_distribution<double> gen(0.0, 1.0);
-  std::uniform_real_distribution<double> gen2(-2.0, +2.0);
-
   // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.progcomc/single_pre_float.htm
-  // We only alter the fraction
+  // We only alter the fraction/mantissa
+  std::uniform_real_distribution<double> gen(0.0, 1.0);
   for (int i = 0; i < parent[i].size(); i++) {
-    for (int j = 31; j < 9; j--) { // DOES NOT INCLUDE THE SIGN
-      if (gen(rng) > chance_of_mutation) {
+    for (int j = 0; j < 23; j++) { // DOES NOT INCLUDE THE SIGN
+      if (gen(rng) < MUTATION_PROB) {
         parent[i].flip(j);
       }
     }
   }
 
   return parent;
-}
-
-void genetic_algorithm::save_generation(population pop_to_save, string filename){
-  std::ofstream file(filename, std::ofstream::binary);
-  unsigned long n;
-  for(size_t i = 0; i < pop_to_save.size(); i++ ) {
-    for (size_t j = 0; j < pop_to_save[i].size(); j++) {
-      n = pop_to_save[i][j].to_ulong();
-      file.write(reinterpret_cast<const char*>(&n), sizeof(n));
-    }
-  }
-
-  std::cout << "Saved population to: " << filename << '\n';
-}
-
-population genetic_algorithm::load_generation(string filename){
-  std::ifstream file(filename, std::ofstream::binary);
-  population loaded_pop (20, std::vector<bitset<32>> (394,0));
-  unsigned long n;
-  for(size_t i = 0; i < 20; i++ ) {
-    for (size_t j = 0; j < 394; j++) {
-      file.read( reinterpret_cast<char*>(&n), sizeof(n) );
-      loaded_pop[i][j] = n;
-    }
-  }
-
-  std::cout << "Loaded population from: " << filename << '\n';
-  return loaded_pop;
 }
 
 // std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
