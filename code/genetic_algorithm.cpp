@@ -55,9 +55,9 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
     for (size_t i = 0; i < evaluation_list_current.size(); i++)
       sum += evaluation_list_current[i].wins;
 
-    cout << "Lowest  fitness: " << evaluation_list_current[0].wins << endl;
-    cout << "Largest fitness: " << evaluation_list_current[evaluation_list_current.size()-1].wins << endl;
-    cout << "Avg.    fitness: " << sum/evaluation_list_current.size() << endl;
+    cout << "Lowest  fitness: " << (evaluation_list_current[0].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Largest fitness: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Avg.    fitness: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
     for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
       cout << "Wins: " << evaluation_list_current[i].wins << "  ";
       cout << "Wins: " << evaluation_list_current[i+evaluation_list_current.size()/2].wins << endl;

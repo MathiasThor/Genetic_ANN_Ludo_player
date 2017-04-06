@@ -33,7 +33,7 @@ void super_ludo_player::calc_fitness()
       enemy_player_in_goal++;
   }
 
-  *my_fitness = own_player_in_goal;
+  *my_fitness = 0;//own_player_in_goal;
                  //own_total_dist_from_start +
                  //own_player_in_goal*2 -
                  //enemy_player_in_goal*5;
