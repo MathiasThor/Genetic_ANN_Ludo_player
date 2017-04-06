@@ -23,6 +23,7 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
   cout << "Crossover Rate:      \t" << CROSSOVER_RATE << endl;
   cout << "Mutation Rate:       \t" << MUTATION_RATE << endl;
   cout << "Mutation Probability:\t" << MUTATION_PROB << endl;
+  cout << "Mutation Amount:     \t" << MUTATION_AMOUNT << endl;
   cout << "Games pr. evaluation:\t" << PLAY_TIMES_EVAL << endl;
   cout << "Games pr. turnament: \t" << PLAY_TIMES_TURNAMENT << endl;
   cout << "Population size:     \t" << POP_SIZE << endl;
@@ -76,18 +77,22 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
   // RECOMBINATION
   ////////////////////////////////
       if (gen(rng) < CROSSOVER_RATE) {
+        cout << ":" << flush;
         crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[1]]);
       }
       else {
+        cout << "." << flush;
         crossover_offsprings.push_back(super_population[two_parents[0]]);
         crossover_offsprings.push_back(super_population[two_parents[1]]);
       }
 
       if (gen(rng) < MUTATION_RATE) {
+        cout << ";" << flush;
         new_generation.push_back(mutation(crossover_offsprings[0]));
         new_generation.push_back(mutation(crossover_offsprings[1]));
       }
       else {
+        cout << "." << flush;
         new_generation.push_back(crossover_offsprings[0]);
         new_generation.push_back(crossover_offsprings[1]);
       }
@@ -96,7 +101,6 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
       //   std::cout << "Mutated: " << bitset_to_float(new_generation[0][i]) << '\n';
       //   std::cout << "Cleaned: " << bitset_to_float(super_population[0][i]) << '\n';
       // }
-      cout << "." << flush;
     }
     cout << endl;
 
@@ -136,14 +140,6 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
   // TODO Now it is generational
   // TODO Consider steady state: Child replaces worst parent if child is better Or
   // TODO Elitism: generational, but best n parents survive
-
-  ////////////////////////////////
-  // STOPPING CRITERION
-  ////////////////////////////////
-  // TODO manual, after X generations
-  // TODO Save every generation
-    // TODO Fitness data
-    // TODO Chromosomes, so we can start from a point again
 
 
   cout << "GENETIC ALGORITHM FINISHED!" << endl;
@@ -254,30 +250,56 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
 std::vector<chromosome> genetic_algorithm::crossover(chromosome parent1, chromosome parent2){
   chromosome offspring_12, offspring_21;
 
+  std::uniform_int_distribution<int> gen_cro(0.0, parent1.size());
+  int cutspot = gen_cro(rng);
+
+  for (int i = 0; i < cutspot; i++) {
+    offspring_12.push_back(parent1[i]);
+    offspring_21.push_back(parent2[i]);
+  }
+
+  for (int i = cutspot; i < parent2.size(); i++) {
+    offspring_12.push_back(parent2[i]);
+    offspring_21.push_back(parent1[i]);
+  }
+
   /* In this way we split it up for each weight */
   /* It may need to be more advanced, like an mask */
-  for (int i = 0; i < parent1.size(); i+=2) {
-    offspring_12.push_back(parent1[i]);
-    offspring_12.push_back(parent2[i+1]);
-    offspring_21.push_back(parent2[i]);
-    offspring_21.push_back(parent1[i+1]);
-  }
+  // for (int i = 0; i < parent1.size(); i+=2) {
+  //   offspring_12.push_back(parent1[i]);
+  //   offspring_12.push_back(parent2[i+1]);
+  //   offspring_21.push_back(parent2[i]);
+  //   offspring_21.push_back(parent1[i+1]);
+  // }
 
   std::vector<chromosome> v{offspring_12, offspring_21};
   return v;
 }
 
 chromosome genetic_algorithm::mutation(chromosome parent){
-  // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.progcomc/single_pre_float.htm
-  // We only alter the fraction/mantissa
+
+  // +- MUTATION_AMOUNT
   std::uniform_real_distribution<double> gen(0.0, 1.0);
+  std::uniform_real_distribution<float> gen1(-MUTATION_AMOUNT, MUTATION_AMOUNT);
   for (int i = 0; i < parent[i].size(); i++) {
     for (int j = 0; j < 23; j++) { // DOES NOT INCLUDE THE SIGN
       if (gen(rng) < MUTATION_PROB) {
-        parent[i].flip(j);
+        parent[i] = float_to_bitset(bitset_to_float(parent[i]) + gen1(rng) );
       }
     }
   }
+
+  // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.progcomc/single_pre_float.htm
+  // We only alter the fraction/mantissa
+
+  // std::uniform_real_distribution<double> gen(0.0, 1.0);
+  // for (int i = 0; i < parent[i].size(); i++) {
+  //   for (int j = 0; j < 23; j++) { // DOES NOT INCLUDE THE SIGN
+  //     if (gen(rng) < MUTATION_PROB) {
+  //       parent[i].flip(j);
+  //     }
+  //   }
+  // }
 
   return parent;
 }

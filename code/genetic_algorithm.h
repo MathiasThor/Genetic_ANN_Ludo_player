@@ -48,9 +48,10 @@ private:
     const int PLAY_TIMES_EVAL      = 50;
     const int PLAY_TIMES_TURNAMENT = 20;
     const float GAUSSIAN_STDDEV    = 5.0;
-    const float CROSSOVER_RATE     = 0.65;
-    const float MUTATION_RATE      = 0.65;
+    const float CROSSOVER_RATE     = 0.5;
+    const float MUTATION_RATE      = 0.4;
     const float MUTATION_PROB      = 0.75;
+    const float MUTATION_AMOUNT    = 2.0;
     FANN::neural_net net;
 
     std::random_device seeder;
