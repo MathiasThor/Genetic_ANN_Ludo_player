@@ -1,7 +1,11 @@
-#include "genetic_algorithm.h"
+#include "neural_network.h"
 
 int main(int argc, char *argv[]){
-    //genetic_algorithm GA(argc,argv, "generation_10.bin");
-    genetic_algorithm GA(argc,argv);
+    QApplication* app = new QApplication( argc, argv );
+
+    //genetic_algorithm GA(app, "generation_10.bin");
+    genetic_algorithm GA(app);
+    //neural_network NN(app); // TODO
+    //NN.learn();
     return 0;
 }

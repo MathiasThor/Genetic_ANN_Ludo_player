@@ -25,6 +25,7 @@ private:
     FANN::neural_net net;
     float* my_fitness;
     bool calculate_fitness;
+    bool learn;
 
     // FUNCTIONS
     std::vector<int> pos_start_of_turn;
@@ -63,6 +64,7 @@ private:
 public:
     super_ludo_player(chromosome player_chromo, float *fitness);
     super_ludo_player(chromosome player_chromo);
+    super_ludo_player(bool do_learning);
     ~super_ludo_player();
 signals:
     void select_piece(int);

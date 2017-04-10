@@ -2,7 +2,6 @@
 using namespace std;
 
 int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
-  QApplication a(argc, argv);
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
@@ -23,32 +22,32 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
   QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
   w.show();
   /*/ //Or don't add the GUI
-  QObject::connect(g,SIGNAL(close()),&a,SLOT(quit()));
+  QObject::connect(g,SIGNAL(close()),a,SLOT(quit()));
   //*/
 
   //set up for each player
-  QObject::connect(g, SIGNAL(player1_start(positions_and_dice)),&p1_green,SLOT(start_turn(positions_and_dice)));
-  QObject::connect(&p1_green,SIGNAL(select_piece(int)),                g, SLOT(movePiece(int)));
-  QObject::connect(g, SIGNAL(player1_end(std::vector<int>)),    &p1_green,SLOT(post_game_analysis(std::vector<int>)));
-  QObject::connect(&p1_green,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
+  QObject::connect(g,        SIGNAL(player1_start(positions_and_dice)),&p1_green,   SLOT(start_turn(positions_and_dice)));
+  QObject::connect(&p1_green,SIGNAL(select_piece(int)),                g,           SLOT(movePiece(int)));
+  QObject::connect(g,        SIGNAL(player1_end(std::vector<int>)),    &p1_green,   SLOT(post_game_analysis(std::vector<int>)));
+  QObject::connect(&p1_green,SIGNAL(turn_complete(bool)),              g,           SLOT(turnComplete(bool)));
 
-  QObject::connect(g, SIGNAL(player2_start(positions_and_dice)),&p2_yellow,SLOT(start_turn(positions_and_dice)));
-  QObject::connect(&p2_yellow,SIGNAL(select_piece(int)),                g, SLOT(movePiece(int)));
-  QObject::connect(g, SIGNAL(player2_end(std::vector<int>)),    &p2_yellow,SLOT(post_game_analysis(std::vector<int>)));
-  QObject::connect(&p2_yellow,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
+  QObject::connect(g,         SIGNAL(player2_start(positions_and_dice)),&p2_yellow, SLOT(start_turn(positions_and_dice)));
+  QObject::connect(&p2_yellow,SIGNAL(select_piece(int)),                g,          SLOT(movePiece(int)));
+  QObject::connect(g,         SIGNAL(player2_end(std::vector<int>)),    &p2_yellow, SLOT(post_game_analysis(std::vector<int>)));
+  QObject::connect(&p2_yellow,SIGNAL(turn_complete(bool)),              g,          SLOT(turnComplete(bool)));
 
-  QObject::connect(g, SIGNAL(player3_start(positions_and_dice)),&p3_blue,SLOT(start_turn(positions_and_dice)));
-  QObject::connect(&p3_blue,SIGNAL(select_piece(int)),                g, SLOT(movePiece(int)));
-  QObject::connect(g, SIGNAL(player3_end(std::vector<int>)),    &p3_blue,SLOT(post_game_analysis(std::vector<int>)));
-  QObject::connect(&p3_blue,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
+  QObject::connect(g,       SIGNAL(player3_start(positions_and_dice)),&p3_blue, SLOT(start_turn(positions_and_dice)));
+  QObject::connect(&p3_blue,SIGNAL(select_piece(int)),                g,        SLOT(movePiece(int)));
+  QObject::connect(g,       SIGNAL(player3_end(std::vector<int>)),    &p3_blue, SLOT(post_game_analysis(std::vector<int>)));
+  QObject::connect(&p3_blue,SIGNAL(turn_complete(bool)),              g,        SLOT(turnComplete(bool)));
 
-  QObject::connect(g, SIGNAL(player4_start(positions_and_dice)),&p4_red,SLOT(start_turn(positions_and_dice)));
-  QObject::connect(&p4_red,SIGNAL(select_piece(int)),                g, SLOT(movePiece(int)));
-  QObject::connect(g, SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
-  QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
+  QObject::connect(g,       SIGNAL(player4_start(positions_and_dice)),&p4_red,SLOT(start_turn(positions_and_dice)));
+  QObject::connect(&p4_red, SIGNAL(select_piece(int)),                g,      SLOT(movePiece(int)));
+  QObject::connect(g,       SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
+  QObject::connect(&p4_red, SIGNAL(turn_complete(bool)),              g,      SLOT(turnComplete(bool)));
 
   g->start();
-  a.exec();
+  a->exec();
 
   // for(int i = 0; i < 10; ++i){
   //     //std::cout << 1 << std::flush;
@@ -65,7 +64,6 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
 }
 
 int genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo){
-  QApplication a(argc, argv);
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
@@ -77,7 +75,7 @@ int genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome play
   game *g = new game;
   g->setGameDelay(0); //if you want to see the game, set a delay
 
-  QObject::connect(g,SIGNAL(close()),&a,SLOT(quit()));
+  QObject::connect(g,SIGNAL(close()),a,SLOT(quit()));
 
   //set up for each player
   QObject::connect(g, SIGNAL(player1_start(positions_and_dice)),&p1_green,SLOT(start_turn(positions_and_dice)));
@@ -101,7 +99,7 @@ int genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome play
   QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
 
   g->start();
-  a.exec();
+  a->exec();
 
   // for(int i = 0; i < 10; ++i){
   //     g.start();

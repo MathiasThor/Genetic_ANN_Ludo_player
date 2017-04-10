@@ -29,7 +29,7 @@ int super_ludo_player::record_my_games(){
   }
 
   ofstream myfile;
-  myfile.open ("plays.data", ios::app);
+  myfile.open ("./../../data/plays_data/plays.data", ios::app);
 
   for (int i = 0; i < 4; i++) {
     myfile <<  can_kill(pos_start_of_turn[i], dice_roll) << " ";

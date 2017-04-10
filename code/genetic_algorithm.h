@@ -41,13 +41,12 @@ class genetic_algorithm {
 
 private:
     // CONSTANTS
-    int argc;
-    char **argv;
+    QApplication* a;
 
-    const int POP_SIZE             = 32;  // Only Even Numbers
+    const int POP_SIZE             = 20;  // Only Even Numbers
     const int PLAY_TIMES_EVAL      = 50;
     const int PLAY_TIMES_TURNAMENT = 20;
-    const float GAUSSIAN_STDDEV    = 0.0;
+    const float GAUSSIAN_STDDEV    = 5.0;
     const float CROSSOVER_RATE     = 0.5;
     const float MUTATION_RATE      = 0.4;
     const float MUTATION_PROB      = 0.75;
@@ -80,7 +79,7 @@ private:
     chromosome mutation(chromosome parent);
 
 public:
-    genetic_algorithm(int argc, char *argv[], std::string load="NO");
+    genetic_algorithm(QApplication* app , std::string load="NO");
     int play_game(chromosome, float *fitness);
 
 };

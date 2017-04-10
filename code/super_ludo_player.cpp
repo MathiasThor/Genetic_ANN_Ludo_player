@@ -8,6 +8,7 @@ super_ludo_player::super_ludo_player(chromosome player_chromo, float *fitness):
   dice_roll(0)
 {
   my_fitness = fitness;
+  learn = false;
   calculate_fitness = true;
   net.create_from_file("./../../ann_code/ludo_player.net");
   set_chromosome_as_weights(player_chromo);
@@ -19,9 +20,22 @@ super_ludo_player::super_ludo_player(chromosome player_chromo):
   dice_roll(0)
 {
   my_fitness = NULL;
+  learn = false;
   calculate_fitness = false;
   net.create_from_file("./../../ann_code/ludo_player.net");
   set_chromosome_as_weights(player_chromo);
+}
+
+super_ludo_player::super_ludo_player(bool do_learning):
+  pos_start_of_turn(16),
+  pos_end_of_turn(16),
+  dice_roll(0),
+  learn(do_learning)
+{
+  my_fitness = NULL;
+  calculate_fitness = false;
+  if (!do_learning)
+    net.create_from_file("./../../ann_code/ludo_player.net");
 }
 
 super_ludo_player::~super_ludo_player()
@@ -93,10 +107,16 @@ int super_ludo_player::make_decision(){
 void super_ludo_player::start_turn(positions_and_dice relative){
     pos_start_of_turn = relative.pos;
     dice_roll = relative.dice;
-    int decision = make_decision();
+    int decision = 99;
+
+    if (learn)
+      decision = record_my_games();
+    else
+      decision = make_decision();
+
     if(calculate_fitness)
       calc_fitness();
-    //int decision = record_my_games();
+
     emit select_piece(decision);
 }
 

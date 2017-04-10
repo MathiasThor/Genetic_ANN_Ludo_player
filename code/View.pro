@@ -23,6 +23,7 @@ SOURCES += main.cpp\
     genetic_algorithm.cpp \
     genetic_algorithm_utils.cpp \
     genetic_algorithm_game.cpp \
+    neural_network.cpp \
     ludo_player_random.cpp
 
 HEADERS  += dialog.h \
@@ -31,6 +32,7 @@ HEADERS  += dialog.h \
     positions_and_dice.h \
     super_ludo_player.h \
     genetic_algorithm.h \
+    neural_network.h \
     ludo_player_random.h
 
 FORMS    += dialog.ui

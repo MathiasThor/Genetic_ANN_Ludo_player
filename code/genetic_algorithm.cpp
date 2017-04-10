@@ -1,12 +1,11 @@
 #include "genetic_algorithm.h"
 using namespace std;
 
-genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load_this_population):
+genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_population):
   seeder(),
   rng(seeder())
   {
-  argc = new_argc;
-  argv = new_argv;
+  a = app;
   int generation = 1;
   string filename = "error";
   population new_generation;
@@ -55,9 +54,9 @@ genetic_algorithm::genetic_algorithm(int new_argc, char *new_argv[], string load
     for (size_t i = 0; i < evaluation_list_current.size(); i++)
       sum += evaluation_list_current[i].wins;
 
-    cout << "Lowest  fitness: " << (evaluation_list_current[0].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
-    cout << "Largest fitness: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
-    cout << "Avg.    fitness: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Lowest  Wins: " << (evaluation_list_current[0].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Largest Wins: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Avg.    Wins: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
     for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
       cout << "Wins: " << evaluation_list_current[i].wins << "  ";
       cout << "Wins: " << evaluation_list_current[i+evaluation_list_current.size()/2].wins << endl;

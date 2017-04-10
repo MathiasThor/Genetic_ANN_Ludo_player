@@ -4,39 +4,36 @@ using namespace std;
 
 void super_ludo_player::calc_fitness()
 {
-  // TODO Number of kills?
-
-  // Distance to goal
+  // Own distance from start
   int own_total_dist_from_start = 0;
   for (size_t i = 0; i < 4; i++) {
     if (pos_start_of_turn[i] == 99)
-      own_total_dist_from_start += 57;
+      own_total_dist_from_start += 70; // Normaly only 57, but extra award!
     else if (pos_start_of_turn[i] == -1)
       own_total_dist_from_start += 0;
     else own_total_dist_from_start += pos_start_of_turn[i];
   }
 
-  // TODO Death's
-
-  // Numbers of players in goal
-  int own_player_in_goal = 0;
-  for (size_t i = 0; i < 4; i++) {
-    if (pos_start_of_turn[i] == 99)
-      own_player_in_goal++;
-  }
-  // TODO Enemy dist to goal
-
-  // TODO Enemy players in goal
-  int enemy_player_in_goal = 0;
+  // Enemy distance from start
+  int enemy_total_dist_from_start = 0;
   for (size_t i = 4; i < pos_start_of_turn.size(); i++) {
     if (pos_start_of_turn[i] == 99)
-      enemy_player_in_goal++;
+      enemy_total_dist_from_start += 70; // Normaly only 57, but extra award!
+    else if (pos_start_of_turn[i] == -1)
+      enemy_total_dist_from_start += 0;
+    else{
+      if (i < 8)
+        enemy_total_dist_from_start += (pos_start_of_turn[i]-13);
+      else if (i < 12)
+        enemy_total_dist_from_start += (pos_start_of_turn[i]-26);
+      else if (i < 16)
+        enemy_total_dist_from_start += (pos_start_of_turn[i]-39);
+      else
+        debug_stop("ERROR", 99, true);
+    }
   }
 
-  *my_fitness = 0;//own_player_in_goal;
-                 //own_total_dist_from_start +
-                 //own_player_in_goal*2 -
-                 //enemy_player_in_goal*5;
+  *my_fitness = own_total_dist_from_start - (enemy_total_dist_from_start/3);
 }
 
 float super_ludo_player::bitset_to_float(bitset<32> input_set){
