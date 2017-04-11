@@ -5,9 +5,9 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
-  ludo_player_random p4_red;
-  ludo_player_random p2_yellow;
-  ludo_player_random p3_blue;
+  ludo_player p4_red;
+  ludo_player p2_yellow;
+  ludo_player p3_blue;
   super_ludo_player p1_green(player_chromo, fitness);
 
   game *g = new game;

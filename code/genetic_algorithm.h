@@ -45,12 +45,12 @@ private:
 
     const int POP_SIZE             = 32;  // Only Even Numbers
     const int PLAY_TIMES_EVAL      = 100;
-    const int PLAY_TIMES_TURNAMENT = 75;
-    const float GAUSSIAN_STDDEV    = 5.0;
+    const int PLAY_TIMES_TURNAMENT = 100;
+    const float GAUSSIAN_STDDEV    = 5.5;
     const float CROSSOVER_RATE     = 0.65;
     const float MUTATION_RATE      = 0.5;
-    const float MUTATION_PROB      = 0.85;
-    const float MUTATION_AMOUNT    = 4.0;
+    const float MUTATION_PROB      = 0.9;
+    const float MUTATION_AMOUNT    = 10.0;
     FANN::neural_net net;
 
     std::random_device seeder;

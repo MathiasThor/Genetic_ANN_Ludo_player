@@ -124,25 +124,25 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   ////////////////////////////////
     //super_population = new_generation;
 
-    // evaluation_list_nxtgn = evaluation(new_generation);
-    // for (size_t i = 0; i < evaluation_list_nxtgn.size()/2; i++) {
-    //   super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
-    // }
-
     evaluation_list_nxtgn = evaluation(new_generation);
-    // // TODO SWAP THE WORST FIRST, NOT THE BEST
-    for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
-      for (size_t j = evaluation_list_current.size()-1; j > 0; j--) {
-        if (evaluation_list_nxtgn[i].fitness > evaluation_list_current[j].fitness) {
-          //cout << "\nSwapped:" << endl;
-          //cout << "Nxtgn: "<< evaluation_list_nxtgn[i].chromo_number << " Fitness: "   << evaluation_list_nxtgn[i].fitness << endl;
-          //cout << "Curre: "<< evaluation_list_current[j].chromo_number << " Fitness: " << evaluation_list_current[j].fitness << endl;
-          super_population[evaluation_list_current[j].chromo_number] = new_generation[evaluation_list_nxtgn[i].chromo_number];
-          evaluation_list_current[j].fitness = evaluation_list_nxtgn[i].fitness;
-          break;
-        }
-      }
+    for (size_t i = 0; i < evaluation_list_nxtgn.size()/2; i++) {
+      super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
     }
+
+    // evaluation_list_nxtgn = evaluation(new_generation);
+    // // // TODO SWAP THE WORST FIRST, NOT THE BEST
+    // for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
+    //   for (size_t j = evaluation_list_current.size()-1; j > 0; j--) {
+    //     if (evaluation_list_nxtgn[i].fitness > evaluation_list_current[j].fitness) {
+    //       //cout << "\nSwapped:" << endl;
+    //       //cout << "Nxtgn: "<< evaluation_list_nxtgn[i].chromo_number << " Fitness: "   << evaluation_list_nxtgn[i].fitness << endl;
+    //       //cout << "Curre: "<< evaluation_list_current[j].chromo_number << " Fitness: " << evaluation_list_current[j].fitness << endl;
+    //       super_population[evaluation_list_current[j].chromo_number] = new_generation[evaluation_list_nxtgn[i].chromo_number];
+    //       evaluation_list_current[j].fitness = evaluation_list_nxtgn[i].fitness;
+    //       break;
+    //     }
+    //   }
+    // }
 
     generation++;
     cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
@@ -162,7 +162,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
 }
 
 void genetic_algorithm::init_population(){
-  net.create_from_file("./../../ann_code/ludo_player.net");
+  net.create_from_file("./../../data/ludo_player.net");
   unsigned int num_connections = net.get_total_connections();
   struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
   net.get_connection_array(connections);

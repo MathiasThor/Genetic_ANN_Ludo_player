@@ -41,11 +41,11 @@ int main(int argc, char* argv[])
     // TODO include learning momentum? net.set_learning_momentum(SOME_FLOAT?);
 
     // GIVE TRAINING DATA AND START TRAINING
-    net.train_on_file("./../code/build/plays.data", max_epochs,
+    net.train_on_file("./../../data/plays_data/plays.data", max_epochs,
         epochs_between_reports, desired_error);
 
     // SAVE THE NETWORK AND DESTROY IT
-    net.save("ludo_player.net");
+    net.save("./../../data/ludo_player.net");
     net.destroy();
   }
   else if (choise=="test") {
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 
     // GET THE NETWORK
     FANN::neural_net net;
-    net.create_from_file("ludo_player.net");
+    net.create_from_file("./../../data/ludo_player.net");
 
     // FILL UP WITH SOME INPUT
     for (int i = 0; i < input_vec.size(); i++) {
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
   else if (choise=="weights") {
     cout << "========\nWEIGHTS\n========\n" << endl;
     FANN::neural_net net;
-    net.create_from_file("ludo_player.net");
+    net.create_from_file("./../../data/ludo_player.net");
     struct fann_connection 	*connections;
     unsigned int num_connections;
 

@@ -10,7 +10,7 @@ super_ludo_player::super_ludo_player(chromosome player_chromo, float *fitness):
   my_fitness = fitness;
   learn = false;
   calculate_fitness = true;
-  net.create_from_file("./../../ann_code/ludo_player.net");
+  net.create_from_file("./../../data/ludo_player.net");
   set_chromosome_as_weights(player_chromo);
 }
 
@@ -22,7 +22,7 @@ super_ludo_player::super_ludo_player(chromosome player_chromo):
   my_fitness = NULL;
   learn = false;
   calculate_fitness = false;
-  net.create_from_file("./../../ann_code/ludo_player.net");
+  net.create_from_file("./../../data/ludo_player.net");
   set_chromosome_as_weights(player_chromo);
 }
 
@@ -35,7 +35,7 @@ super_ludo_player::super_ludo_player(bool do_learning):
   my_fitness = NULL;
   calculate_fitness = false;
   if (!do_learning)
-    net.create_from_file("./../../ann_code/ludo_player.net");
+    net.create_from_file("./../../data/ludo_player.net");
 }
 
 super_ludo_player::~super_ludo_player()
