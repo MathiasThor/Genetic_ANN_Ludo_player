@@ -14,6 +14,14 @@ void super_ludo_player::calc_fitness()
     else own_total_dist_from_start += pos_start_of_turn[i];
   }
 
+  // } else if(relative_positions[i] < modifier) {
+  //     relative_positions[i] = (relative_positions[i]+52-modifier);
+  // } else if(relative_positions[i] > 50) {
+  //     relative_positions[i] = (relative_positions[i]-color*5-1);
+  // } else if(relative_positions[i] >= modifier) {
+  //     relative_positions[i] = (relative_positions[i]-modifier);
+  // }
+
   // Enemy distance from start
   int enemy_total_dist_from_start = 0;
   for (size_t i = 4; i < pos_start_of_turn.size(); i++) {
@@ -22,12 +30,51 @@ void super_ludo_player::calc_fitness()
     else if (pos_start_of_turn[i] == -1)
       enemy_total_dist_from_start += 0;
     else{
-      if (i < 8)
-        enemy_total_dist_from_start += (pos_start_of_turn[i]-13);
-      else if (i < 12)
-        enemy_total_dist_from_start += (pos_start_of_turn[i]-26);
-      else if (i < 16)
-        enemy_total_dist_from_start += (pos_start_of_turn[i]-39);
+      if (i < 8){
+        if (pos_start_of_turn[i] < 13) {
+          //debug_stop("Check 13!", (pos_start_of_turn[i]-13)+52, true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-13)+52;
+
+        }else if (pos_start_of_turn[i] > 50) {
+          //debug_stop("Check YELLOW*", (pos_start_of_turn[i]-1*5), true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-1*5);
+
+        } else {
+          //debug_stop("Check 13", (pos_start_of_turn[i]-13), true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-13);
+
+        }
+      }
+      else if (i < 12){
+        if (pos_start_of_turn[i] < 26) {
+          //debug_stop("Check 26!", (pos_start_of_turn[i]-26)+52, true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-26)+52;
+
+        }else if (pos_start_of_turn[i] > 50) {
+          //debug_stop("Check BLUE*", (pos_start_of_turn[i]-2*5), true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-2*5);
+
+        } else {
+          //debug_stop("Check 26", (pos_start_of_turn[i]-26), true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-26);
+
+        }
+      }
+      else if (i < 16){
+        if (pos_start_of_turn[i] < 39) {
+          //debug_stop("Check 39!", (pos_start_of_turn[i]-39)+52, true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-39)+52;
+
+        }else if (pos_start_of_turn[i] > 50) {
+          //debug_stop("Check RED*", (pos_start_of_turn[i]-3*5), true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-3*5);
+
+        } else {
+          //debug_stop("Check 26", (pos_start_of_turn[i]-39), true);
+          enemy_total_dist_from_start += (pos_start_of_turn[i]-39);
+
+        }
+      }
       else
         debug_stop("ERROR", 99, true);
     }

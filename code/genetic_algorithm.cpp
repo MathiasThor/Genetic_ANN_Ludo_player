@@ -14,7 +14,12 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   std::vector<chromosome> crossover_offsprings;
   std::vector<int> two_parents;
   std::uniform_real_distribution<double> gen(0.0, 1.0);
-  float sum = 0;
+  float sum, sum2;
+
+  ofstream average_file;
+  average_file.open ("./../../data/average_fitness.dat");
+  ofstream largest_file;
+  largest_file.open ("./../../data/largest_fitness.dat");
 
   cout << "\nStarting Genetic Ludo Algorithm" << endl;
   cout << "-------------------------------" << endl;
@@ -38,7 +43,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     unsigned first = load_this_population.find("_");
     unsigned last = load_this_population.find(".");
     string strNew = load_this_population.substr (first+1,last-first-1);
-    super_population = load_generation("./generation_data/"+load_this_population);
+    super_population = load_generation("./../../data/generation_data/"+load_this_population);
     generation = atoi(strNew.c_str()) + 1;
   }
   cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
@@ -51,15 +56,26 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     evaluation_list_current = evaluation(super_population);
 
     sum = 0;
-    for (size_t i = 0; i < evaluation_list_current.size(); i++)
+    sum2 = 0;
+    for (size_t i = 0; i < evaluation_list_current.size(); i++){
       sum += evaluation_list_current[i].wins;
+      sum2 += evaluation_list_current[i].fitness;
+    }
 
-    cout << "Lowest  Wins: " << (evaluation_list_current[0].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
-    cout << "Largest Wins: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
-    cout << "Avg.    Wins: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
+    // cout << "Lowest  Wins: " << (evaluation_list_current[0].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
+    // cout << "Largest Wins: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
+    // cout << "Avg.    Wins: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
+
+    cout << "Lowest  Fitness: " << (evaluation_list_current[0].fitness/(double)PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Largest Fitness: " << (evaluation_list_current[evaluation_list_current.size()-1].fitness/(double)PLAY_TIMES_EVAL)*100 << endl;
+    cout << "Avg.    Fitness: " << ((sum2/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl << endl;
+
+    largest_file << (evaluation_list_current[evaluation_list_current.size()-1].fitness/(double)PLAY_TIMES_EVAL)*100 << endl;
+    average_file << ((sum2/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
+
     for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
-      cout << "Wins: " << evaluation_list_current[i].wins << "  ";
-      cout << "Wins: " << evaluation_list_current[i+evaluation_list_current.size()/2].wins << endl;
+      cout << "fit.: " << evaluation_list_current[i].fitness << "   \t";
+      cout << "fit.: " << evaluation_list_current[i+evaluation_list_current.size()/2].fitness << endl;
     }
 
   ////////////////////////////////
@@ -106,32 +122,32 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   ////////////////////////////////
   // REPLACEMENT
   ////////////////////////////////
-    super_population = new_generation;
+    //super_population = new_generation;
 
     // evaluation_list_nxtgn = evaluation(new_generation);
     // for (size_t i = 0; i < evaluation_list_nxtgn.size()/2; i++) {
     //   super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
     // }
 
-    // evaluation_list_nxtgn = evaluation(new_generation);
+    evaluation_list_nxtgn = evaluation(new_generation);
     // // TODO SWAP THE WORST FIRST, NOT THE BEST
-    // for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
-    //   for (size_t j = evaluation_list_current.size()-1; j > 0; j--) {
-    //     if (evaluation_list_nxtgn[i].fitness > evaluation_list_current[j].fitness) {
-    //       cout << "\nSwapped:" << endl;
-    //       cout << "Nxtgn: "<< evaluation_list_nxtgn[i].chromo_number << " Fitness: "   << evaluation_list_nxtgn[i].fitness << endl;
-    //       cout << "Curre: "<< evaluation_list_current[j].chromo_number << " Fitness: " << evaluation_list_current[j].fitness << endl;
-    //       super_population[evaluation_list_current[j].chromo_number] = new_generation[evaluation_list_nxtgn[i].chromo_number];
-    //       evaluation_list_current[j].fitness = evaluation_list_nxtgn[i].fitness;
-    //       break;
-    //     }
-    //   }
-    // }
+    for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
+      for (size_t j = evaluation_list_current.size()-1; j > 0; j--) {
+        if (evaluation_list_nxtgn[i].fitness > evaluation_list_current[j].fitness) {
+          //cout << "\nSwapped:" << endl;
+          //cout << "Nxtgn: "<< evaluation_list_nxtgn[i].chromo_number << " Fitness: "   << evaluation_list_nxtgn[i].fitness << endl;
+          //cout << "Curre: "<< evaluation_list_current[j].chromo_number << " Fitness: " << evaluation_list_current[j].fitness << endl;
+          super_population[evaluation_list_current[j].chromo_number] = new_generation[evaluation_list_nxtgn[i].chromo_number];
+          evaluation_list_current[j].fitness = evaluation_list_nxtgn[i].fitness;
+          break;
+        }
+      }
+    }
 
     generation++;
     cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
     if (generation%5 == 0) {
-      filename = "./generation_data/generation_"+to_string(generation)+".bin";
+      filename = "./../../data/generation_data/generation_"+to_string(generation)+".bin";
       save_generation(super_population, filename);
     }
   }
@@ -140,7 +156,8 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   // TODO Consider steady state: Child replaces worst parent if child is better Or
   // TODO Elitism: generational, but best n parents survive
 
-
+  average_file.close();
+  largest_file.close();
   cout << "GENETIC ALGORITHM FINISHED!" << endl;
 }
 

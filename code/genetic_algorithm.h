@@ -33,7 +33,7 @@ struct chromo_eval {
   int wins;
   float fitness;
   bool operator<(const chromo_eval& a) const{
-      return wins < a.wins;
+      return fitness < a.fitness;
   }
 } ;
 
@@ -43,13 +43,13 @@ private:
     // CONSTANTS
     QApplication* a;
 
-    const int POP_SIZE             = 20;  // Only Even Numbers
-    const int PLAY_TIMES_EVAL      = 50;
-    const int PLAY_TIMES_TURNAMENT = 20;
+    const int POP_SIZE             = 32;  // Only Even Numbers
+    const int PLAY_TIMES_EVAL      = 100;
+    const int PLAY_TIMES_TURNAMENT = 75;
     const float GAUSSIAN_STDDEV    = 5.0;
-    const float CROSSOVER_RATE     = 0.5;
-    const float MUTATION_RATE      = 0.4;
-    const float MUTATION_PROB      = 0.75;
+    const float CROSSOVER_RATE     = 0.65;
+    const float MUTATION_RATE      = 0.5;
+    const float MUTATION_PROB      = 0.85;
     const float MUTATION_AMOUNT    = 4.0;
     FANN::neural_net net;
 
