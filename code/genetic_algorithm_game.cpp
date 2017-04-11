@@ -46,24 +46,22 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
   QObject::connect(g,       SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
   QObject::connect(&p4_red, SIGNAL(turn_complete(bool)),              g,      SLOT(turnComplete(bool)));
 
-  g->start();
-  a->exec();
+  //g->start();
+  //a->exec();
 
-  // for(int i = 0; i < 10; ++i){
-  //     //std::cout << 1 << std::flush;
-  //     g.start();
-  //     //std::cout << 2 << std::flush;
-  //     a.exec();
-  //     //std::cout << 3 << std::flush;
-  //     g.reset();
-  //     //std::cout << 4 << std::flush;
-  // }
+  for(int i = 0; i < PLAY_TIMES_EVAL; ++i){
+      g->start();
+      a->exec();
+      while (a->closingDown()){}
+      g->reset();
+      if(g->wait()){}
+  }
 
   //std::vector<int> v { g.wins[0], g.wins[1], g.wins[2], g.wins[3] };
   return g->wins[3];
 }
 
-int genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo){
+std::vector<int> genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo){
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
@@ -98,14 +96,16 @@ int genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome play
   QObject::connect(g, SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
   QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
 
-  g->start();
-  a->exec();
+  // g->start();
+  // a->exec();
 
-  // for(int i = 0; i < 10; ++i){
-  //     g.start();
-  //     a.exec();
-  //     g.reset();
-  // }
+  for(int i = 0; i < PLAY_TIMES_TURNAMENT; ++i){
+      g->start();
+      a->exec();
+      while (a->closingDown()){}
+      g->reset();
+      if(g->wait()){}
+  }
 
   std::vector<int> v { g->wins[0], g->wins[1], g->wins[2], g->wins[3] };
 
@@ -118,5 +118,5 @@ int genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome play
         largest_index = i;
       }
   }
-  return largest_index;
+  return v;
 }

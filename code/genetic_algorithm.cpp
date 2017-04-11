@@ -50,7 +50,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
 
 
   ////////////////////////////////
-  // EVALUATION BUG (Dbus thing)
+  // EVALUATION
   ////////////////////////////////
   for (size_t i = 0; i < 10000; i++) {
     evaluation_list_current = evaluation(super_population);
@@ -66,15 +66,15 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     // cout << "Largest Wins: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
     // cout << "Avg.    Wins: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
 
-    cout << "Lowest  Fitness: " << (evaluation_list_current[0].fitness/(double)PLAY_TIMES_EVAL)*100 << endl;
-    cout << "Largest Fitness: " << (evaluation_list_current[evaluation_list_current.size()-1].fitness/(double)PLAY_TIMES_EVAL)*100 << endl;
-    cout << "Avg.    Fitness: " << ((sum2/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl << endl;
+    cout << "Lowest  Fitness: " << evaluation_list_current[0].fitness << endl;
+    cout << "Largest Fitness: " << evaluation_list_current[evaluation_list_current.size()-1].fitness << endl;
+    cout << "Avg.    Fitness: " << (sum2/evaluation_list_current.size()) << endl << endl;
 
-    largest_file << (evaluation_list_current[evaluation_list_current.size()-1].fitness/(double)PLAY_TIMES_EVAL)*100 << endl;
-    average_file << ((sum2/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
+    largest_file << evaluation_list_current[evaluation_list_current.size()-1].fitness << endl;
+    average_file << (sum2/evaluation_list_current.size()) << endl;
 
     for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
-      cout << "fit.: " << evaluation_list_current[i].fitness << "   \t";
+      cout << "fit.: " << evaluation_list_current[i].fitness << "     \t";
       cout << "fit.: " << evaluation_list_current[i+evaluation_list_current.size()/2].fitness << endl;
     }
 
@@ -122,13 +122,16 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   ////////////////////////////////
   // REPLACEMENT
   ////////////////////////////////
+    // TODO Generational
     //super_population = new_generation;
 
+    // TODO Elitism: generational, but best n parents survive
     evaluation_list_nxtgn = evaluation(new_generation);
     for (size_t i = 0; i < evaluation_list_nxtgn.size()/2; i++) {
       super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
     }
 
+    // TODO Consider steady state: Child replaces worst parent if child is better Or
     // evaluation_list_nxtgn = evaluation(new_generation);
     // // // TODO SWAP THE WORST FIRST, NOT THE BEST
     // for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
@@ -151,10 +154,6 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
       save_generation(super_population, filename);
     }
   }
-
-  // TODO Now it is generational
-  // TODO Consider steady state: Child replaces worst parent if child is better Or
-  // TODO Elitism: generational, but best n parents survive
 
   average_file.close();
   largest_file.close();
@@ -187,12 +186,11 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
     fitness = 0;
     wins = 0;
 
-    for (int j = 0; j < PLAY_TIMES_EVAL; j++)
-      wins += play_game(input_pop[i], fitness_pointer);
+    wins = play_game(input_pop[i], fitness_pointer);
 
-    tmp_chromo_eval.wins = wins;
+    tmp_chromo_eval.wins = wins/PLAY_TIMES_EVAL;
     tmp_chromo_eval.chromo_number = i;
-    tmp_chromo_eval.fitness = fitness;
+    tmp_chromo_eval.fitness = fitness/(double)PLAY_TIMES_EVAL;
     evaluation_list.push_back(tmp_chromo_eval);
   }
   cout << endl;
@@ -202,9 +200,8 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
 }
 
 std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval> eval_list){
-  // TODO TURNAMENT WITH BEST 50%
   int parent;
-  std::vector<int> winnings(4,0);
+  //std::vector<int> winnings(4,0);
   std::vector<int> two_parents;
   std::random_device seeder;
   std::mt19937 rng(seeder());
@@ -217,10 +214,10 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
       random_num = gen(rng);
     rng_list.push_back(random_num);
   }
-  for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
-    parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
-    winnings[parent] += 1;
-  }
+  // for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
+    std::vector<int> winnings = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
+  //   winnings[parent] += 1;
+  // }
 
   int largest = 0;
   int largest_index = 0;
@@ -242,10 +239,10 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
     rng_list.push_back(random_num);
   }
 
-  for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
-    parent = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
-    winnings[parent] += 1;
-  }
+  // for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
+    winnings = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
+  //   winnings[parent] += 1;
+  // }
 
   largest = 0;
   largest_index = 0;

@@ -14,14 +14,6 @@ void super_ludo_player::calc_fitness()
     else own_total_dist_from_start += pos_start_of_turn[i];
   }
 
-  // } else if(relative_positions[i] < modifier) {
-  //     relative_positions[i] = (relative_positions[i]+52-modifier);
-  // } else if(relative_positions[i] > 50) {
-  //     relative_positions[i] = (relative_positions[i]-color*5-1);
-  // } else if(relative_positions[i] >= modifier) {
-  //     relative_positions[i] = (relative_positions[i]-modifier);
-  // }
-
   // Enemy distance from start
   int enemy_total_dist_from_start = 0;
   for (size_t i = 4; i < pos_start_of_turn.size(); i++) {
@@ -80,7 +72,7 @@ void super_ludo_player::calc_fitness()
     }
   }
 
-  *my_fitness = own_total_dist_from_start - (enemy_total_dist_from_start/3);
+  *my_fitness += own_total_dist_from_start - (enemy_total_dist_from_start/3);
 }
 
 float super_ludo_player::bitset_to_float(bitset<32> input_set){

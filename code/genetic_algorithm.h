@@ -44,8 +44,8 @@ private:
     QApplication* a;
 
     const int POP_SIZE             = 32;  // Only Even Numbers
-    const int PLAY_TIMES_EVAL      = 100;
-    const int PLAY_TIMES_TURNAMENT = 100;
+    const int PLAY_TIMES_EVAL      = 500;
+    const int PLAY_TIMES_TURNAMENT = 500;
     const float GAUSSIAN_STDDEV    = 5.5;
     const float CROSSOVER_RATE     = 0.65;
     const float MUTATION_RATE      = 0.5;
@@ -67,7 +67,7 @@ private:
     void set_chromosome_as_weights( chromosome input_chromo);
     union { float input; unsigned long long output;} data;
 
-    int play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo);
+    std::vector<int> play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo);
 
     void save_generation(population pop_to_save, std::string filename);
     population load_generation(std::string filename);

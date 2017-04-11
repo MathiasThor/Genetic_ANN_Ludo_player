@@ -1,0 +1,13 @@
+Starting Genetic Ludo Algorithm
+-------------------------------
+Gaussian std_dev:    	5.5
+Crossover Rate:      	0.65
+Mutation Rate:       	0.5
+Mutation Probability:	0.9
+Mutation Amount:     	10
+Games pr. evaluation:	500
+Games pr. turnament: 	500
+Population size:     	32
+-------------------------------
+
+Elitism: generational, but best 50% parents survive
