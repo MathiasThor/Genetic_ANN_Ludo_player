@@ -5,10 +5,10 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
+  super_ludo_player p1_green(player_chromo, fitness);
   ludo_player p4_red;
   ludo_player p2_yellow;
   ludo_player p3_blue;
-  super_ludo_player p1_green(player_chromo, fitness);
 
   game *g = new game;
   g->setGameDelay(0); //if you want to see the game, set a delay
@@ -57,8 +57,10 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
       if(g->wait()){}
   }
 
+  //std::cout << "Wins " << g->wins[0] << " " << g->wins[1] << " "<< g->wins[2] << " " << g->wins[3] << endl;
+
   //std::vector<int> v { g.wins[0], g.wins[1], g.wins[2], g.wins[3] };
-  return g->wins[3];
+  return g->wins[0];
 }
 
 std::vector<int> genetic_algorithm::play_turnament(chromosome player1_chromo, chromosome player2_chromo, chromosome player3_chromo, chromosome player4_chromo){

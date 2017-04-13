@@ -5,6 +5,9 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   seeder(),
   rng(seeder())
   {
+  current_best.fitness = 0;
+  current_best.wins = 0;
+  current_best.chromo_number = 0;
   a = app;
   int generation = 1;
   string filename = "error";
@@ -66,17 +69,19 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     // cout << "Largest Wins: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
     // cout << "Avg.    Wins: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
 
-    cout << "Lowest  Fitness: " << evaluation_list_current[0].fitness << endl;
+    cout << "\nLowest  Fitness: " << evaluation_list_current[0].fitness << endl;
     cout << "Largest Fitness: " << evaluation_list_current[evaluation_list_current.size()-1].fitness << endl;
-    cout << "Avg.    Fitness: " << (sum2/evaluation_list_current.size()) << endl << endl;
+    cout << "Avg.    Fitness: " << (sum2/evaluation_list_current.size()) << endl;
+    cout << "Win Ratio:       " << evaluation_list_current[evaluation_list_current.size()-1].wins << " of " << PLAY_TIMES_EVAL << endl << endl;
+
 
     largest_file << evaluation_list_current[evaluation_list_current.size()-1].fitness << endl;
     average_file << (sum2/evaluation_list_current.size()) << endl;
 
-    for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
-      cout << "fit.: " << evaluation_list_current[i].fitness << "     \t";
-      cout << "fit.: " << evaluation_list_current[i+evaluation_list_current.size()/2].fitness << endl;
-    }
+    // for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
+    //   cout << "fit.: " << evaluation_list_current[i].fitness << "     \t";
+    //   cout << "fit.: " << evaluation_list_current[i+evaluation_list_current.size()/2].fitness << endl;
+    // }
 
   ////////////////////////////////
   // SELECTION
@@ -188,7 +193,7 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
 
     wins = play_game(input_pop[i], fitness_pointer);
 
-    tmp_chromo_eval.wins = wins/PLAY_TIMES_EVAL;
+    tmp_chromo_eval.wins = wins;
     tmp_chromo_eval.chromo_number = i;
     tmp_chromo_eval.fitness = fitness/(double)PLAY_TIMES_EVAL;
     evaluation_list.push_back(tmp_chromo_eval);

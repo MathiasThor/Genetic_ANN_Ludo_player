@@ -83,14 +83,12 @@ population genetic_algorithm::load_generation(string filename){
   return loaded_pop;
 }
 
-// TODO: THE FOLLOWING I ABLE TO RESIZE
-// for (size_t i = 0; i < 8; i++)
-//   super_population[0][0].reset(i);
-//
-// std::bitset<24> hello;
-//
-// for (size_t i = 31; i > 7; i--)
-//   hello[i-8] = super_population[0][0][i];
-//
-// cout << endl;
-// cout << hello << "\n" << super_population[0][0] << endl;
+void genetic_algorithm::new_best( population input_pop, std::vector<chromo_eval> eval_list ){
+  if (eval_list[eval_list.size()-1].fitness > current_best.fitness) {
+    current_best.fitness = eval_list[eval_list.size()-1].fitness;
+    current_best.wins = eval_list[eval_list.size()-1].wins;
+    current_best.chromo_number = eval_list[eval_list.size()-1].chromo_number;
+
+    // TODO Store in population of 1 in an file with save!
+  }
+}
