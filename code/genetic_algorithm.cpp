@@ -5,9 +5,9 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   seeder(),
   rng(seeder())
   {
-  current_best.fitness = 0;
-  current_best.wins = 0;
-  current_best.chromo_number = 0;
+  current_best_eval.fitness = 0;
+  current_best_eval.wins = 0;
+  current_best_eval.chromo_number = 0;
   a = app;
   int generation = 1;
   string filename = "error";
@@ -26,14 +26,14 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
 
   cout << "\nStarting Genetic Ludo Algorithm" << endl;
   cout << "-------------------------------" << endl;
+  cout << "Population size:     \t" << POP_SIZE << endl;
+  cout << "Games pr. evaluation:\t" << PLAY_TIMES_EVAL << endl;
+  cout << "Games pr. turnament: \t" << PLAY_TIMES_TURNAMENT << endl;
   cout << "Gaussian std_dev:    \t" << GAUSSIAN_STDDEV << endl;
   cout << "Crossover Rate:      \t" << CROSSOVER_RATE << endl;
   cout << "Mutation Rate:       \t" << MUTATION_RATE << endl;
   cout << "Mutation Probability:\t" << MUTATION_PROB << endl;
   cout << "Mutation Amount:     \t" << MUTATION_AMOUNT << endl;
-  cout << "Games pr. evaluation:\t" << PLAY_TIMES_EVAL << endl;
-  cout << "Games pr. turnament: \t" << PLAY_TIMES_TURNAMENT << endl;
-  cout << "Population size:     \t" << POP_SIZE << endl;
   cout << "-------------------------------\n" << endl;
 
   ////////////////////////////////
@@ -152,12 +152,23 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     //   }
     // }
 
+    if (evaluation_list_current[evaluation_list_current.size()-1].wins > current_best_eval.wins) {
+      current_best_eval.fitness = evaluation_list_current[evaluation_list_current.size()-1].fitness;
+      current_best_eval.wins = evaluation_list_current[evaluation_list_current.size()-1].wins;
+      current_best_eval.chromo_number = evaluation_list_current[evaluation_list_current.size()-1].chromo_number;
+      cout << "New Best Chromosome: " << current_best_eval.chromo_number << endl;
+      //filename = "best_chromosome.bin";
+      //save_chromosome(super_population[current_best_eval.chromo_number], filename);
+      set_chromosome_as_weights(super_population[current_best_eval.chromo_number]);
+      net.save("./../../data/current_best_player.net");
+    }
+
     generation++;
     cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
-    if (generation%5 == 0) {
-      filename = "./../../data/generation_data/generation_"+to_string(generation)+".bin";
-      save_generation(super_population, filename);
-    }
+    // if (generation%5 == 0) {
+    //   filename = "./../../data/generation_data/generation_"+to_string(generation)+".bin";
+    //   save_generation(super_population, filename);
+    // }
   }
 
   average_file.close();
@@ -213,16 +224,13 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
   std::uniform_int_distribution<int> gen(0, super_population.size()-1);
   std::vector<int> rng_list;
   int random_num;
-
   for (int i = 0; i < 4; i++) {
     while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end())
       random_num = gen(rng);
     rng_list.push_back(random_num);
   }
-  // for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
-    std::vector<int> winnings = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
-  //   winnings[parent] += 1;
-  // }
+
+  std::vector<int> winnings = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
 
   int largest = 0;
   int largest_index = 0;
@@ -244,10 +252,7 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
     rng_list.push_back(random_num);
   }
 
-  // for (int i = 0; i < PLAY_TIMES_TURNAMENT; i++) {
-    winnings = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
-  //   winnings[parent] += 1;
-  // }
+  winnings = play_turnament(super_population[rng_list[0]], super_population[rng_list[1]], super_population[rng_list[2]], super_population[rng_list[3]]);
 
   largest = 0;
   largest_index = 0;

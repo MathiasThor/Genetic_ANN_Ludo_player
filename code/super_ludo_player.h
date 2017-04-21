@@ -65,6 +65,7 @@ public:
     super_ludo_player(chromosome player_chromo, float *fitness);
     super_ludo_player(chromosome player_chromo);
     super_ludo_player(bool do_learning);
+    super_ludo_player(bool do_learning, std::string load_from);
     ~super_ludo_player();
 signals:
     void select_piece(int);

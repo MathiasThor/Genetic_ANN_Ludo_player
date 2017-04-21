@@ -43,15 +43,16 @@ private:
     // CONSTANTS
     QApplication* a;
 
-    const int POP_SIZE             = 32;  // Only Even Numbers
-    const int PLAY_TIMES_EVAL      = 250;
-    const int PLAY_TIMES_TURNAMENT = 250;
-    const float GAUSSIAN_STDDEV    = 5.0;
-    const float CROSSOVER_RATE     = 0.65;
-    const float MUTATION_RATE      = 0.5;
-    const float MUTATION_PROB      = 0.9;
-    const float MUTATION_AMOUNT    = 7.0;
-    chromo_eval current_best;
+    const int POP_SIZE             = 24;  // Only Even Numbers
+    const int PLAY_TIMES_EVAL      = 500;
+    const int PLAY_TIMES_TURNAMENT = 500;
+    const float GAUSSIAN_STDDEV    = 2.0;
+    const float CROSSOVER_RATE     = 0.75;
+    const float MUTATION_RATE      = 0.65;
+    const float MUTATION_PROB      = 0.8;
+    const float MUTATION_AMOUNT    = 5.0;
+    chromo_eval current_best_eval;
+    population current_best_chromo;
     FANN::neural_net net;
 
     std::random_device seeder;
@@ -60,7 +61,6 @@ private:
     population super_population;
 
     // FUNCTIONS
-    void new_best( population, std::vector<chromo_eval> ); // TODO IMPLEMENT
     void debug_stop( std::string action );
     std::bitset<32> float_to_bitset(float);
     float bitset_to_float(std::bitset<32>);
@@ -73,6 +73,8 @@ private:
 
     void save_generation(population pop_to_save, std::string filename);
     population load_generation(std::string filename);
+    void save_chromosome(chromosome pop_to_save, std::string filename);
+    chromosome load_chromosome(std::string filename);
 
     void init_population();
     std::vector<chromo_eval> evaluation( population );

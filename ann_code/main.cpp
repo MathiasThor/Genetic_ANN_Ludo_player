@@ -7,7 +7,6 @@
 
 using namespace std;
 // http://leenissen.dk/fann/wp/help/getting-started/
-// Follow this example "bitch dick face"
 
 int main(int argc, char* argv[])
 {
@@ -20,7 +19,7 @@ int main(int argc, char* argv[])
     const unsigned int num_output = 4;
     const unsigned int num_layers = 3;
     const unsigned int num_neurons_hidden = 6;
-    const float desired_error = (const float) 0.011;
+    const float desired_error = (const float) 0.03;
     const float learning_rate = (const float) 0.8;
     const float init_weights_range = (const float) 0.77;
     const unsigned int max_epochs = 500000;
@@ -35,17 +34,17 @@ int main(int argc, char* argv[])
     // SETUP NETWORK
     net.set_activation_function_hidden(FANN::SIGMOID);
     net.set_activation_function_output(FANN::SIGMOID);
-    net.set_training_algorithm(FANN::TRAIN_BATCH); // BATCH TRAIN MODE
+    net.set_training_algorithm(FANN::TRAIN_INCREMENTAL);  // BATCH TRAIN MODE --> TRAIN_INCREMENTAL & TRAIN_BATCH
     net.set_learning_rate(learning_rate);
     net.randomize_weights(-init_weights_range, init_weights_range); // Suggested by Thimm and Fiesler
     // TODO include learning momentum? net.set_learning_momentum(SOME_FLOAT?);
 
     // GIVE TRAINING DATA AND START TRAINING
-    net.train_on_file("./../../data/plays_data/plays.data", max_epochs,
+    net.train_on_file("./../data/plays_data/plays.data", max_epochs,
         epochs_between_reports, desired_error);
 
     // SAVE THE NETWORK AND DESTROY IT
-    net.save("./../../data/ludo_player.net");
+    net.save("./../data/ludo_player.net");
     net.destroy();
   }
   else if (choise=="test") {
@@ -67,7 +66,7 @@ int main(int argc, char* argv[])
 
     // GET THE NETWORK
     FANN::neural_net net;
-    net.create_from_file("./../../data/ludo_player.net");
+    net.create_from_file("./../data/ludo_player.net");
 
     // FILL UP WITH SOME INPUT
     for (int i = 0; i < input_vec.size(); i++) {
@@ -83,7 +82,7 @@ int main(int argc, char* argv[])
   else if (choise=="weights") {
     cout << "========\nWEIGHTS\n========\n" << endl;
     FANN::neural_net net;
-    net.create_from_file("./../../data/ludo_player.net");
+    net.create_from_file("./../data/ludo_player.net");
     struct fann_connection 	*connections;
     unsigned int num_connections;
 

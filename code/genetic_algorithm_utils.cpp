@@ -64,8 +64,19 @@ void genetic_algorithm::save_generation(population pop_to_save, string filename)
       file.write(reinterpret_cast<const char*>(&n), sizeof(n));
     }
   }
-
+  file.close();
   std::cout << "Saved population to: " << filename << '\n';
+}
+
+void genetic_algorithm::save_chromosome(chromosome chrom_to_save, string filename){
+  std::ofstream file(filename, std::ofstream::binary);
+  unsigned long n;
+  for (size_t j = 0; j < chrom_to_save.size(); j++) {
+    n = chrom_to_save[j].to_ulong();
+    file.write(reinterpret_cast<const char*>(&n), sizeof(n));
+  }
+  file.close();
+  std::cout << "Saved chromosome to: " << filename << '\n';
 }
 
 population genetic_algorithm::load_generation(string filename){
@@ -78,17 +89,31 @@ population genetic_algorithm::load_generation(string filename){
       loaded_pop[i][j] = n;
     }
   }
-
+  file.close();
   std::cout << "Loaded population from: " << filename << '\n';
   return loaded_pop;
 }
 
-void genetic_algorithm::new_best( population input_pop, std::vector<chromo_eval> eval_list ){
-  if (eval_list[eval_list.size()-1].fitness > current_best.fitness) {
-    current_best.fitness = eval_list[eval_list.size()-1].fitness;
-    current_best.wins = eval_list[eval_list.size()-1].wins;
-    current_best.chromo_number = eval_list[eval_list.size()-1].chromo_number;
-
-    // TODO Store in population of 1 in an file with save!
+chromosome genetic_algorithm::load_chromosome(string filename){
+  std::ifstream file(filename, std::ofstream::binary);
+  chromosome loaded_chrom(394,0);
+  unsigned long n;
+  for (size_t j = 0; j < 394; j++) {
+    file.read( reinterpret_cast<char*>(&n), sizeof(n) );
+    loaded_chrom[j] = n;
   }
+  file.close();
+  std::cout << "Loaded chromosome from: " << filename << '\n';
+  return loaded_chrom;
+}
+
+void genetic_algorithm::set_chromosome_as_weights( chromosome input_chromo ){
+  unsigned int num_connections = net.get_total_connections();
+  struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
+  net.get_connection_array(connections);
+
+  for (int i = 0; i < num_connections; ++i)
+    connections[i].weight = bitset_to_float(input_chromo[i]);
+
+  net.set_weight_array(connections, num_connections);
 }

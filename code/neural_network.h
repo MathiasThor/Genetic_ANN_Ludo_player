@@ -35,6 +35,7 @@ private:
 public:
     neural_network( QApplication* app );
     void play();
+    void star_gamer();
     void learn();
 };
 

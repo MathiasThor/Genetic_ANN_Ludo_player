@@ -38,6 +38,18 @@ super_ludo_player::super_ludo_player(bool do_learning):
     net.create_from_file("./../../data/ludo_player.net");
 }
 
+super_ludo_player::super_ludo_player(bool do_learning, std::string load_from):
+  pos_start_of_turn(16),
+  pos_end_of_turn(16),
+  dice_roll(0),
+  learn(do_learning)
+{
+  my_fitness = NULL;
+  calculate_fitness = false;
+  if (!do_learning)
+    net.create_from_file(load_from);
+}
+
 super_ludo_player::~super_ludo_player()
 {
   net.destroy();
