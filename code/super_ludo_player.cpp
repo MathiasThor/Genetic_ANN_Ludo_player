@@ -83,7 +83,7 @@ int super_ludo_player::make_decision(){
     input[11+(i*15)] =currently_in_safe_zone(pos_start_of_turn[i]);
     input[12+(i*15)] =currently_in_non_danger_zone(pos_start_of_turn[i]);
     input[13+(i*15)] =currently_on_globe(pos_start_of_turn[i]);
-    input[14+(i*15)] =currently_home(pos_start_of_turn[i]);
+    input[14+(i*15)] =currently_on_star(pos_start_of_turn[i]);
   }
 
   calc_out = net.run(input);

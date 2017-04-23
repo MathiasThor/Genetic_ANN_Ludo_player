@@ -7,18 +7,19 @@ int main(int argc, char *argv[]){
     // genetic_algorithm GA(app);
     neural_network NN(app);
     NN.star_gamer();
+    NN.play();
     return 0;
 }
 
 
 // Play:
-// 2828
-// 2545
-// 2351
-// 2276
+// 2540
+// 2612
+// 2517
+// 2331
 
 // Star_gamer:
-// 2866
-// 2447
-// 2504
-// 2183
+// 3108
+// 2406
+// 2261
+// 2225

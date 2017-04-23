@@ -42,12 +42,11 @@ int super_ludo_player::record_my_games(){
     myfile <<  can_get_out_of_start(pos_start_of_turn[i], dice_roll)<< " ";
     myfile <<  can_get_on_enemy_start(pos_start_of_turn[i], dice_roll)<< " ";
     myfile <<  can_move(pos_start_of_turn[i], dice_roll)<< " ";
-
     myfile <<  currently_on_enemy_start(pos_start_of_turn[i])<< " ";
     myfile <<  currently_in_safe_zone(pos_start_of_turn[i])<< " ";
     myfile <<  currently_in_non_danger_zone(pos_start_of_turn[i])<< " ";
     myfile <<  currently_on_globe(pos_start_of_turn[i])<< " ";
-    myfile <<  currently_home(pos_start_of_turn[i])<< " ";
+    myfile <<  currently_on_star(pos_start_of_turn[i])<< " ";
   }
 
   myfile <<  "\n";

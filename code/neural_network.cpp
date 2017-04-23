@@ -91,8 +91,8 @@ void neural_network::play(){
   QObject::connect(&p4_red, SIGNAL(turn_complete(bool)),              g,      SLOT(turnComplete(bool)));
 
   for(int i = 0; i < 10000; ++i){
-      if (i%100 == 0)
-        std::cout << i << std::endl;
+      if (i%200 == 0)
+        std::cout << "." << std::flush;
       g->start();
       a->exec();
       while (a->closingDown()){}
@@ -139,8 +139,8 @@ void neural_network::star_gamer(){
   QObject::connect(&p4_red, SIGNAL(turn_complete(bool)),              g,      SLOT(turnComplete(bool)));
 
   for(int i = 0; i < 10000; ++i){
-      if (i%100 == 0)
-        std::cout << i << std::endl;
+      if (i%200 == 0)
+        std::cout << "." << std::flush;
       g->start();
       a->exec();
       while (a->closingDown()){}

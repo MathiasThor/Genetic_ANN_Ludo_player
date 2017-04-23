@@ -8,9 +8,9 @@ void super_ludo_player::calc_fitness()
   int own_total_dist_from_start = 0;
   for (size_t i = 0; i < 4; i++) {
     if (pos_start_of_turn[i] == 99)
-      own_total_dist_from_start += 70; // Normaly only 57, but extra award!
+      own_total_dist_from_start += 100; // Normaly only 57, but extra award!
     else if (pos_start_of_turn[i] == -1)
-      own_total_dist_from_start += 0;
+      own_total_dist_from_start += -10;
     else own_total_dist_from_start += pos_start_of_turn[i];
   }
 
@@ -20,7 +20,7 @@ void super_ludo_player::calc_fitness()
     if (pos_start_of_turn[i] == 99)
       enemy_total_dist_from_start += 70; // Normaly only 57, but extra award!
     else if (pos_start_of_turn[i] == -1)
-      enemy_total_dist_from_start += 0;
+      enemy_total_dist_from_start += -10;
     else{
       if (i < 8){
         if (pos_start_of_turn[i] < 13) {
@@ -72,7 +72,7 @@ void super_ludo_player::calc_fitness()
     }
   }
 
-  *my_fitness += own_total_dist_from_start - (enemy_total_dist_from_start/3);
+  *my_fitness += (own_total_dist_from_start/4) - (enemy_total_dist_from_start/4)/3;
 }
 
 float super_ludo_player::bitset_to_float(bitset<32> input_set){

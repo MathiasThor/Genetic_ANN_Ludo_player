@@ -90,8 +90,6 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     cout << "Selection and Replacement" << flush;
     for (int i = 0; i < POP_SIZE/2; i++) {
       two_parents = selection_turnament(evaluation_list_current);
-      // cout << "parent 1: " << two_parents[0] << endl;
-      // cout << "parent 2: " << two_parents[1] << endl;
 
   ////////////////////////////////
   // RECOMBINATION
@@ -206,7 +204,7 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
 
     tmp_chromo_eval.wins = wins;
     tmp_chromo_eval.chromo_number = i;
-    tmp_chromo_eval.fitness = fitness/(double)PLAY_TIMES_EVAL;
+    tmp_chromo_eval.fitness = (fitness + wins)/(double)PLAY_TIMES_EVAL; // wins
     evaluation_list.push_back(tmp_chromo_eval);
   }
   cout << endl;
@@ -303,11 +301,11 @@ chromosome genetic_algorithm::mutation(chromosome parent){
 
   // +- MUTATION_AMOUNT
   std::uniform_real_distribution<double> gen(0.0, 1.0);
-  std::uniform_real_distribution<float> gen1(-MUTATION_AMOUNT, MUTATION_AMOUNT);
+  std::uniform_real_distribution<float> gen1(-MUTATION_AMOUNT/2, MUTATION_AMOUNT/2);
   for (int i = 0; i < parent[i].size(); i++) {
     for (int j = 0; j < 23; j++) { // DOES NOT INCLUDE THE SIGN
       if (gen(rng) < MUTATION_PROB) {
-        parent[i] = float_to_bitset(bitset_to_float(parent[i]) + gen1(rng) );
+        parent[i] = float_to_bitset( bitset_to_float(parent[i]) + gen1(rng) );
       }
     }
   }

@@ -206,6 +206,14 @@ bool super_ludo_player::currently_on_globe(int pos){
 }
 
 // OK
+bool super_ludo_player::currently_on_star(int pos){
+  if ( can_get_on_star(pos,0) || pos == 0) {
+    return true;
+  }
+  return false;
+}
+
+// OK
 bool super_ludo_player::can_get_on_enemy_start(int pos, int new_dice_roll){
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
     if ((pos+new_dice_roll) % 13 == 0) {

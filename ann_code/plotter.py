@@ -11,10 +11,14 @@ epokes =  []
 for i in xrange(len(error)):
     epokes.append(i);
 
-plt.style.use('grayscale') # seaborn-bright	
-plt.plot(epokes, error)
-plt.ylabel('error')
-plt.xlabel('epoch')
+plt.axis([0, 50, 0, 0.14])
+plt.rcParams.update({'font.size': 24})
+plt.gcf().subplots_adjust(bottom=0.13)
+plt.gcf().subplots_adjust(left=0.15)
+plt.style.use('seaborn-bright') # seaborn-bright
+plt.plot(epokes, error, linewidth=3)
+plt.ylabel('Error')
+plt.xlabel('Epoch')
 #plt.title('Error')
 plt.grid(True)
 plt.savefig("test.png")

@@ -14,12 +14,15 @@ gen =  []
 for i in xrange(len(l_fit)):
     gen.append(i);
 
-plt.style.use('grayscale') # seaborn-bright
-plt.plot(gen, l_fit, label="largest fitness")
-plt.plot(gen, a_fit, label="average fitness")
-plt.ylabel('fitness')
-plt.xlabel('generation')
-plt.legend( loc='upper left', numpoints = 1 )
+plt.axis([0, 40, 250, 850])
+plt.rcParams.update({'font.size': 20})
+plt.gcf().subplots_adjust(bottom=0.12)
+plt.style.use('seaborn-bright') # seaborn-bright
+plt.plot(gen, l_fit, label="Largest fitness", linewidth=3)
+plt.plot(gen, a_fit, label="Average fitness", linewidth=3)
+plt.ylabel('Fitness')
+plt.xlabel('Generation')
+plt.legend( loc='lower right', numpoints = 1 )
 plt.grid(True)
 plt.savefig("fitness_plot.png")
 plt.show()

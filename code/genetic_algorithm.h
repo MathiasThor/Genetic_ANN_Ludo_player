@@ -43,14 +43,14 @@ private:
     // CONSTANTS
     QApplication* a;
 
-    const int POP_SIZE             = 24;  // Only Even Numbers
-    const int PLAY_TIMES_EVAL      = 500;
-    const int PLAY_TIMES_TURNAMENT = 500;
-    const float GAUSSIAN_STDDEV    = 2.0;
-    const float CROSSOVER_RATE     = 0.75;
-    const float MUTATION_RATE      = 0.65;
+    const int POP_SIZE             = 20;  // Only Even Numbers
+    const int PLAY_TIMES_EVAL      = 250;
+    const int PLAY_TIMES_TURNAMENT = 250;
+    const float GAUSSIAN_STDDEV    = 1.0;
+    const float CROSSOVER_RATE     = 1.0;
+    const float MUTATION_RATE      = 1.0;
     const float MUTATION_PROB      = 0.8;
-    const float MUTATION_AMOUNT    = 5.0;
+    const float MUTATION_AMOUNT    = 0.5;
     chromo_eval current_best_eval;
     population current_best_chromo;
     FANN::neural_net net;
