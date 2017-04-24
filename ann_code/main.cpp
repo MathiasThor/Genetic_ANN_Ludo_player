@@ -95,6 +95,18 @@ int main(int argc, char* argv[])
              connections[i].to_neuron, connections[i].weight);
     }
   }
+  else if (choise=="vali") {
+    cout << "========\nVALIDATING\n========\n" << endl;
+    FANN::neural_net net;
+    net.create_from_file("./../data/ludo_player.net");
+    struct fann_train_data *data = fann_read_train_from_file("./../data/plays_data/plays.data");
+    net.reset_MSE();
+    for(int i = 0 ; i != data->num_data ; i++ ) {
+      net.test(data->input[i], data->output[i]);
+    }
+    printf("Mean Square Error: %f\n", net.get_MSE());
+    fann_destroy_train(data);
+  }
 
     return 0;
 }

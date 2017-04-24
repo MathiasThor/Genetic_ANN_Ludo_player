@@ -7,7 +7,8 @@ int main(int argc, char *argv[]){
     // genetic_algorithm GA(app);
     neural_network NN(app);
     NN.star_gamer();
-    NN.play();
+    //NN.play();
+    // NN.learn();
     return 0;
 }
 

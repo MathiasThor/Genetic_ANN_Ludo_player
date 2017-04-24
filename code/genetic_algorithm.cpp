@@ -96,7 +96,8 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   ////////////////////////////////
       if (gen(rng) < CROSSOVER_RATE) {
         cout << ":" << flush;
-        crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[1]]);
+        // crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[1]]); // TODO -- TEST
+        crossover_offsprings = crossover_2point(super_population[two_parents[0]],super_population[two_parents[1]]); // TODO -- TEST
       }
       else {
         cout << "." << flush;
@@ -204,7 +205,7 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
 
     tmp_chromo_eval.wins = wins;
     tmp_chromo_eval.chromo_number = i;
-    tmp_chromo_eval.fitness = (fitness + wins)/(double)PLAY_TIMES_EVAL; // wins
+    tmp_chromo_eval.fitness = (((fitness*0.0001 + wins))/(double)PLAY_TIMES_EVAL) * 100; // TODO -- TEST (was 5)
     evaluation_list.push_back(tmp_chromo_eval);
   }
   cout << endl;
@@ -219,7 +220,7 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
   std::vector<int> two_parents;
   std::random_device seeder;
   std::mt19937 rng(seeder());
-  std::uniform_int_distribution<int> gen(0, super_population.size()-1);
+  std::uniform_int_distribution<int> gen(super_population.size()*0.25, super_population.size()-1); // TODO -- TEST
   std::vector<int> rng_list;
   int random_num;
   for (int i = 0; i < 4; i++) {
@@ -245,7 +246,7 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
   winnings.clear();
 
   for (int i = 0; i < 4; i++) {
-    while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end() || random_num == rng_list[parent])
+    while(std::find(rng_list.begin(), rng_list.end(), random_num) != rng_list.end() && random_num == rng_list[parent])
       random_num = gen(rng);
     rng_list.push_back(random_num);
   }
@@ -292,6 +293,36 @@ std::vector<chromosome> genetic_algorithm::crossover(chromosome parent1, chromos
   //   offspring_21.push_back(parent2[i]);
   //   offspring_21.push_back(parent1[i+1]);
   // }
+
+  std::vector<chromosome> v{offspring_12, offspring_21};
+  return v;
+}
+
+std::vector<chromosome> genetic_algorithm::crossover_2point(chromosome parent1, chromosome parent2){
+  chromosome offspring_12, offspring_21;
+
+  std::uniform_int_distribution<int> gen_cro(0.0, parent1.size());
+  int cutspot1 = gen_cro(rng);
+  int cutspot2 = gen_cro(rng);
+
+  if (cutspot1 > cutspot2) {
+    std::swap(cutspot1,cutspot2);
+  }
+
+  for (int i = 0; i < cutspot1; i++) {
+    offspring_12.push_back(parent1[i]);
+    offspring_21.push_back(parent2[i]);
+  }
+
+  for (int i = cutspot1; i < cutspot2; i++) {
+    offspring_12.push_back(parent1[i]);
+    offspring_21.push_back(parent2[i]);
+  }
+
+  for (int i = cutspot2; i < parent2.size(); i++) {
+    offspring_12.push_back(parent2[i]);
+    offspring_21.push_back(parent1[i]);
+  }
 
   std::vector<chromosome> v{offspring_12, offspring_21};
   return v;
