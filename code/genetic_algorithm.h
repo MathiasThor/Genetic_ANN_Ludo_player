@@ -43,14 +43,14 @@ private:
     // CONSTANTS
     QApplication* a;
 
-    const int POP_SIZE             = 36;  // Only Even Numbers
+    const int POP_SIZE             = 36;
     const int PLAY_TIMES_EVAL      = 250;
     const int PLAY_TIMES_TURNAMENT = 250;
     const float GAUSSIAN_STDDEV    = 5.0;
     const float CROSSOVER_RATE     = 0.65;
     const float MUTATION_RATE      = 0.5;
     const float MUTATION_PROB      = 0.8;
-    const float MUTATION_AMOUNT    = 7.0; // TESTED: High is not good
+    const float MUTATION_STD       = 7.0; // TESTED: High is not good
     chromo_eval current_best_eval;
     population current_best_chromo;
     FANN::neural_net net;
@@ -79,6 +79,7 @@ private:
     void init_population();
     std::vector<chromo_eval> evaluation( population );
     std::vector<int> selection_turnament(std::vector<chromo_eval>);
+    std::vector<int> selection_roulette(std::vector<chromo_eval>);
     std::vector<chromosome> crossover(chromosome parent1, chromosome parent2);
     std::vector<chromosome> crossover_2point(chromosome parent1, chromosome parent2);
     chromosome mutation(chromosome parent);

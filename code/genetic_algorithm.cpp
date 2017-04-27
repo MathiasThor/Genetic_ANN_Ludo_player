@@ -33,7 +33,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   cout << "Crossover Rate:      \t" << CROSSOVER_RATE << endl;
   cout << "Mutation Rate:       \t" << MUTATION_RATE << endl;
   cout << "Mutation Probability:\t" << MUTATION_PROB << endl;
-  cout << "Mutation Amount:     \t" << MUTATION_AMOUNT << endl;
+  cout << "Mutation Amount:     \t" << MUTATION_STD << endl;
   cout << "-------------------------------\n" << endl;
 
   ////////////////////////////////
@@ -89,7 +89,8 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     new_generation.clear();
     cout << "Selection and Replacement" << flush;
     for (int i = 0; i < POP_SIZE/2; i++) {
-      two_parents = selection_turnament(evaluation_list_current);
+      two_parents = selection_roulette(evaluation_list_current);
+      // two_parents = selection_tournament(evaluation_list_current);
 
   ////////////////////////////////
   // RECOMBINATION
@@ -285,15 +286,6 @@ std::vector<chromosome> genetic_algorithm::crossover(chromosome parent1, chromos
     offspring_21.push_back(parent1[i]);
   }
 
-  /* In this way we split it up for each weight */
-  /* It may need to be more advanced, like an mask */
-  // for (int i = 0; i < parent1.size(); i+=2) {
-  //   offspring_12.push_back(parent1[i]);
-  //   offspring_12.push_back(parent2[i+1]);
-  //   offspring_21.push_back(parent2[i]);
-  //   offspring_21.push_back(parent1[i+1]);
-  // }
-
   std::vector<chromosome> v{offspring_12, offspring_21};
   return v;
 }
@@ -330,30 +322,47 @@ std::vector<chromosome> genetic_algorithm::crossover_2point(chromosome parent1, 
 
 chromosome genetic_algorithm::mutation(chromosome parent){
 
-  // +- MUTATION_AMOUNT
+  float tmp = 0;
+
   std::uniform_real_distribution<double> gen(0.0, 1.0);
-  std::uniform_real_distribution<float> gen1(-MUTATION_AMOUNT/2, MUTATION_AMOUNT/2);
-  for (int i = 0; i < parent[i].size(); i++) {
-    for (int j = 0; j < 23; j++) { // DOES NOT INCLUDE THE SIGN
-      if (gen(rng) < MUTATION_PROB) {
-        parent[i] = float_to_bitset( bitset_to_float(parent[i]) + gen1(rng) );
-      }
+  std::uniform_real_distribution<float> gen1(-MUTATION_STD/2, MUTATION_STD/2);
+  // std::normal_distribution<float> gen1(0, MUTATION_STD/2);
+
+  for (int i = 0; i < parent.size(); i++) {
+    if (gen(rng) < MUTATION_PROB) {
+      tmp = bitset_to_float( parent[i] );
+      tmp += gen1(rng);
+      parent[i] = float_to_bitset( tmp );
     }
   }
 
-  // https://www.ibm.com/support/knowledgecenter/ssw_aix_72/com.ibm.aix.progcomc/single_pre_float.htm
-  // We only alter the fraction/mantissa
+  return parent;
+}
 
-  // std::uniform_real_distribution<double> gen(0.0, 1.0);
-  // for (int i = 0; i < parent[i].size(); i++) {
-  //   for (int j = 0; j < 23; j++) { // DOES NOT INCLUDE THE SIGN
-  //     if (gen(rng) < MUTATION_PROB) {
-  //       parent[i].flip(j);
-  //     }
-  //   }
+std::vector<int> genetic_algorithm::selection_roulette(std::vector<chromo_eval> eval_list){
+
+  vector<int> roulette_wheel;
+
+  for (int i = 0; i < eval_list.size(); i++) {
+    for (int j = 0; j < i; j++)
+      roulette_wheel.push_back(eval_list[i].chromo_number);
+  }
+
+  // for (int i = 0; i < roulette_wheel.size(); i++) {
+  //   cout << roulette_wheel[i] << " ";
   // }
 
-  return parent;
+  // cout << endl;
+
+  std::uniform_int_distribution<int> select_parent(0, roulette_wheel.size()-1);
+  vector<int> two_parents;
+
+  two_parents.push_back(roulette_wheel[select_parent(rng)]);
+  two_parents.push_back(roulette_wheel[select_parent(rng)]);
+
+  // cout << two_parents[0] << " and " << two_parents[1] << endl;
+
+  return two_parents;
 }
 
 // std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;

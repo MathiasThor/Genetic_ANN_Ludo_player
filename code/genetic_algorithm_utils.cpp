@@ -35,9 +35,9 @@ chromosome genetic_algorithm::add_gaussian_noise_to_chromosome( chromosome input
   // Define random generator with Gaussian distribution
   const double mean = 0.0;
   const double stddev = GAUSSIAN_STDDEV;
-  double tmp = 0;
+  float tmp = 0;
   std::default_random_engine generator (std::chrono::system_clock::now().time_since_epoch().count());
-  std::normal_distribution<double> dist(mean, stddev);
+  std::normal_distribution<float> dist(mean, stddev);
 
   // Add Gaussian noise
   for (size_t i = 0; i < input_chromo.size(); i++) {
