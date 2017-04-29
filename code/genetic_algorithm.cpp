@@ -39,6 +39,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   ////////////////////////////////
   // INIT POPULATION W. GAUSSIAN
   ////////////////////////////////
+  net.create_from_file("./../../data/ludo_player.net");
 
   if (load_this_population == "NO") {
     init_population();
@@ -90,7 +91,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     cout << "Selection and Replacement" << flush;
     for (int i = 0; i < POP_SIZE/2; i++) {
       two_parents = selection_roulette(evaluation_list_current);
-      // two_parents = selection_tournament(evaluation_list_current);
+      // two_parents = selection_turnament(evaluation_list_current);
 
   ////////////////////////////////
   // RECOMBINATION
@@ -132,7 +133,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
 
     // TODO Elitism: generational, but best n parents survive
     evaluation_list_nxtgn = evaluation(new_generation);
-    for (size_t i = 0; i < evaluation_list_nxtgn.size()/2; i++) {
+    for (size_t i = 0; i < evaluation_list_nxtgn.size()*0.75; i++) { // TODO TRY WITH 75%
       super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
     }
 
@@ -156,19 +157,21 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
       current_best_eval.fitness = evaluation_list_current[evaluation_list_current.size()-1].fitness;
       current_best_eval.wins = evaluation_list_current[evaluation_list_current.size()-1].wins;
       current_best_eval.chromo_number = evaluation_list_current[evaluation_list_current.size()-1].chromo_number;
-      cout << "New Best Chromosome: " << current_best_eval.chromo_number << endl;
-      //filename = "best_chromosome.bin";
-      //save_chromosome(super_population[current_best_eval.chromo_number], filename);
+      cout << "Saving new Best Chromosome: " << current_best_eval.chromo_number << endl;
+      // filename = "best_chromosome.bin";
+      // save_chromosome(super_population[current_best_eval.chromo_number], filename);
       set_chromosome_as_weights(super_population[current_best_eval.chromo_number]);
       net.save("./../../data/current_best_player.net");
+      // net.save("./../../data/best_player.net");
+    }
+
+    if (generation%5 == 0) {
+      filename = "./../../data/generation_data/generation_"+to_string(generation)+".bin";
+      save_generation(super_population, filename);
     }
 
     generation++;
     cout << "\n----------------\n GENERATION " << generation << "\n----------------" << endl;
-    // if (generation%5 == 0) {
-    //   filename = "./../../data/generation_data/generation_"+to_string(generation)+".bin";
-    //   save_generation(super_population, filename);
-    // }
   }
 
   average_file.close();
@@ -177,7 +180,6 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
 }
 
 void genetic_algorithm::init_population(){
-  net.create_from_file("./../../data/ludo_player.net");
   unsigned int num_connections = net.get_total_connections();
   struct fann_connection *connections = (struct fann_connection *) malloc(sizeof(struct fann_connection) * num_connections);
   net.get_connection_array(connections);
@@ -325,8 +327,8 @@ chromosome genetic_algorithm::mutation(chromosome parent){
   float tmp = 0;
 
   std::uniform_real_distribution<double> gen(0.0, 1.0);
-  std::uniform_real_distribution<float> gen1(-MUTATION_STD/2, MUTATION_STD/2);
-  // std::normal_distribution<float> gen1(0, MUTATION_STD/2);
+  // std::uniform_real_distribution<float> gen1(-MUTATION_STD/2, MUTATION_STD/2);
+  std::normal_distribution<float> gen1(0, MUTATION_STD/2);
 
   for (int i = 0; i < parent.size(); i++) {
     if (gen(rng) < MUTATION_PROB) {

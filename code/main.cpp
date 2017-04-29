@@ -3,11 +3,12 @@
 int main(int argc, char *argv[]){
     QApplication* app = new QApplication( argc, argv );
 
-    //genetic_algorithm GA(app, "generation_90.bin");
-    // genetic_algorithm GA(app);
+    // genetic_algorithm GA(app, "generation_830.bin");
+    //genetic_algorithm GA(app);
     neural_network NN(app);
-    NN.star_gamer();
-    //NN.play();
+    for (int i = 0; i < 10; i++) 
+      NN.star_gamer();
+    // NN.play();
     // NN.learn();
     return 0;
 }
