@@ -14,12 +14,13 @@ gen =  []
 for i in xrange(len(l_fit)):
     gen.append(i);
 
-plt.axis([0, 500, 9, 80])
+plt.axis([0, 1450, 9, 75])
 plt.rcParams.update({'font.size': 20})
 plt.gcf().subplots_adjust(bottom=0.12)
 plt.style.use('seaborn-bright') # seaborn-bright
 plt.plot(gen, l_fit, label="Largest fitness", linewidth=3)
 plt.plot(gen, a_fit, label="Average fitness", linewidth=3)
+plt.title('Tournament')
 plt.ylabel('Fitness')
 plt.xlabel('Generation')
 plt.legend( loc='lower right', numpoints = 1 )

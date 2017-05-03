@@ -24,7 +24,8 @@ chromosome genetic_algorithm::get_chromosome( fann_connection* connections , uns
   chromosome new_chromo;
 
   for (int i = 0; i < num_connections; ++i)
-    new_chromo.push_back( float_to_bitset(connections[i].weight) );
+    new_chromo.push_back( float_to_bitset(0) );
+    // new_chromo.push_back( float_to_bitset(connections[i].weight) );
 
   return new_chromo;
 }
