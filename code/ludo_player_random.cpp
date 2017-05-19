@@ -10,7 +10,7 @@ ludo_player_random::ludo_player_random():
 }
 
 int ludo_player_random::make_decision(){
-    std::vector<int> valid_moves; // BUG - Causes double free
+    std::vector<int> valid_moves;
     if(dice_roll == 6){
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]<0){

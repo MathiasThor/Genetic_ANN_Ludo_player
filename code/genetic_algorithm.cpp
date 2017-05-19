@@ -1,10 +1,12 @@
 #include "genetic_algorithm.h"
 using namespace std;
 
+// THE ACTUAL GENETIC ALGORITHM FUNCTION
 genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_population):
   seeder(),
   rng(seeder())
   {
+  // Initialize stuff:
   current_best_eval.fitness = 0;
   current_best_eval.wins = 0;
   current_best_eval.chromo_number = 0;
@@ -24,6 +26,7 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
   ofstream largest_file;
   largest_file.open ("./../../data/largest_fitness.dat");
 
+  // Write out evolution parameters
   cout << "\nStarting Genetic Ludo Algorithm" << endl;
   cout << "-------------------------------" << endl;
   cout << "Population size:     \t" << POP_SIZE << endl;
@@ -66,23 +69,14 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
       sum2 += evaluation_list_current[i].fitness;
     }
 
-    // cout << "Lowest  Wins: " << (evaluation_list_current[0].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
-    // cout << "Largest Wins: " << (evaluation_list_current[evaluation_list_current.size()-1].wins/(double)PLAY_TIMES_EVAL)*100 << endl;
-    // cout << "Avg.    Wins: " << ((sum/evaluation_list_current.size())/PLAY_TIMES_EVAL)*100 << endl;
-
+    // User data
     cout << "\nLowest  Fitness: " << evaluation_list_current[0].fitness << endl;
     cout << "Largest Fitness: " << evaluation_list_current[evaluation_list_current.size()-1].fitness << endl;
     cout << "Avg.    Fitness: " << (sum2/evaluation_list_current.size()) << endl;
     cout << "Win Ratio:       " << evaluation_list_current[evaluation_list_current.size()-1].wins << " of " << PLAY_TIMES_EVAL << endl << endl;
 
-
     largest_file << evaluation_list_current[evaluation_list_current.size()-1].fitness << endl;
     average_file << (sum2/evaluation_list_current.size()) << endl;
-
-    // for (size_t i = 0; i < evaluation_list_current.size()/2; i++){
-    //   cout << "fit.: " << evaluation_list_current[i].fitness << "     \t";
-    //   cout << "fit.: " << evaluation_list_current[i+evaluation_list_current.size()/2].fitness << endl;
-    // }
 
   ////////////////////////////////
   // SELECTION
@@ -91,15 +85,15 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     cout << "Selection and Replacement" << flush;
     for (int i = 0; i < POP_SIZE/2; i++) {
       two_parents = selection_roulette(evaluation_list_current);
-      // two_parents = selection_turnament(evaluation_list_current);
+      // two_parents = selection_turnament(evaluation_list_current); // Use this for tournament selection
 
   ////////////////////////////////
   // RECOMBINATION
   ////////////////////////////////
       if (gen(rng) < CROSSOVER_RATE) {
         cout << ":" << flush;
-        // crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[1]]); // TODO -- TEST
-        crossover_offsprings = crossover_2point(super_population[two_parents[0]],super_population[two_parents[1]]); // TODO -- TEST
+        // crossover_offsprings = crossover(super_population[two_parents[0]],super_population[two_parents[1]]); // Single point crossover
+        crossover_offsprings = crossover_2point(super_population[two_parents[0]],super_population[two_parents[1]]); // Two point crossover
       }
       else {
         cout << "." << flush;
@@ -117,29 +111,22 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
         new_generation.push_back(crossover_offsprings[0]);
         new_generation.push_back(crossover_offsprings[1]);
       }
-
-      // for (size_t i = 0; i < new_generation[0][0].size(); i++) {
-      //   std::cout << "Mutated: " << bitset_to_float(new_generation[0][i]) << '\n';
-      //   std::cout << "Cleaned: " << bitset_to_float(super_population[0][i]) << '\n';
-      // }
     }
     cout << endl;
 
   ////////////////////////////////
   // REPLACEMENT
   ////////////////////////////////
-    // TODO Generational
+    // Pure Generational
     //super_population = new_generation;
 
-    // TODO Elitism: generational, but best n parents survive
+    // Elitism: generational, but best n parents survive
     evaluation_list_nxtgn = evaluation(new_generation);
     for (size_t i = 0; i < evaluation_list_nxtgn.size()*0.75; i++) { // TODO TRY WITH 75%
       super_population[evaluation_list_current[i].chromo_number] = new_generation[evaluation_list_nxtgn[evaluation_list_nxtgn.size()-1-i].chromo_number];
     }
 
-    // TODO Consider steady state: Child replaces worst parent if child is better Or
-    // evaluation_list_nxtgn = evaluation(new_generation);
-    // // // TODO SWAP THE WORST FIRST, NOT THE BEST
+    // Steady state: Child replaces worst parent if child is better
     // for (size_t i = evaluation_list_nxtgn.size()-1; i > 0 ; i--) {
     //   for (size_t j = evaluation_list_current.size()-1; j > 0; j--) {
     //     if (evaluation_list_nxtgn[i].fitness > evaluation_list_current[j].fitness) {
@@ -153,18 +140,17 @@ genetic_algorithm::genetic_algorithm( QApplication* app , string load_this_popul
     //   }
     // }
 
+    // Save best player
     if (evaluation_list_current[evaluation_list_current.size()-1].wins > current_best_eval.wins) {
       current_best_eval.fitness = evaluation_list_current[evaluation_list_current.size()-1].fitness;
       current_best_eval.wins = evaluation_list_current[evaluation_list_current.size()-1].wins;
       current_best_eval.chromo_number = evaluation_list_current[evaluation_list_current.size()-1].chromo_number;
       cout << "Saving new Best Chromosome: " << current_best_eval.chromo_number << endl;
-      // filename = "best_chromosome.bin";
-      // save_chromosome(super_population[current_best_eval.chromo_number], filename);
       set_chromosome_as_weights(super_population[current_best_eval.chromo_number]);
       net.save("./../../data/current_best_player.net");
-      // net.save("./../../data/best_player.net");
     }
 
+    // Save Population every fifth Generation
     if (generation%5 == 0) {
       filename = "./../../data/generation_data/generation_"+to_string(generation)+".bin";
       save_generation(super_population, filename);
@@ -208,7 +194,7 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
 
     tmp_chromo_eval.wins = wins;
     tmp_chromo_eval.chromo_number = i;
-    tmp_chromo_eval.fitness = (((fitness*0.0001 + wins))/(double)PLAY_TIMES_EVAL) * 100; // TODO -- TEST (was 5)
+    tmp_chromo_eval.fitness = (((fitness*0.0001 + wins))/(double)PLAY_TIMES_EVAL) * 100;
     evaluation_list.push_back(tmp_chromo_eval);
   }
   cout << endl;
@@ -219,11 +205,11 @@ vector<chromo_eval> genetic_algorithm::evaluation(population input_pop){
 
 std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval> eval_list){
   int parent;
-  //std::vector<int> winnings(4,0);
   std::vector<int> two_parents;
   std::random_device seeder;
   std::mt19937 rng(seeder());
-  std::uniform_int_distribution<int> gen(super_population.size()*0.25, super_population.size()-1); // TODO -- TEST
+  // std::uniform_int_distribution<int> gen(0, super_population.size()-1);
+  std::uniform_int_distribution<int> gen(super_population.size()*0.25, super_population.size()-1); // Elitism Tournament
   std::vector<int> rng_list;
   int random_num;
   for (int i = 0; i < 4; i++) {
@@ -268,6 +254,24 @@ std::vector<int> genetic_algorithm::selection_turnament(std::vector<chromo_eval>
 
   two_parents.push_back(rng_list[largest_index]);
   rng_list.clear();
+
+  return two_parents;
+}
+
+std::vector<int> genetic_algorithm::selection_roulette(std::vector<chromo_eval> eval_list){
+
+  vector<int> roulette_wheel;
+
+  for (int i = 0; i < eval_list.size(); i++) {
+    for (int j = 0; j < i; j++)
+      roulette_wheel.push_back(eval_list[i].chromo_number);
+  }
+
+  std::uniform_int_distribution<int> select_parent(0, roulette_wheel.size()-1);
+  vector<int> two_parents;
+
+  two_parents.push_back(roulette_wheel[select_parent(rng)]);
+  two_parents.push_back(roulette_wheel[select_parent(rng)]);
 
   return two_parents;
 }
@@ -327,7 +331,7 @@ chromosome genetic_algorithm::mutation(chromosome parent){
   float tmp = 0;
 
   std::uniform_real_distribution<double> gen(0.0, 1.0);
-  // std::uniform_real_distribution<float> gen1(-MUTATION_STD/2, MUTATION_STD/2);
+  // std::uniform_real_distribution<float> gen1(-MUTATION_STD/2, MUTATION_STD/2); // Uniform Mutation
   std::normal_distribution<float> gen1(0, MUTATION_STD/2);
 
   for (int i = 0; i < parent.size(); i++) {
@@ -340,34 +344,3 @@ chromosome genetic_algorithm::mutation(chromosome parent){
 
   return parent;
 }
-
-std::vector<int> genetic_algorithm::selection_roulette(std::vector<chromo_eval> eval_list){
-
-  vector<int> roulette_wheel;
-
-  for (int i = 0; i < eval_list.size(); i++) {
-    for (int j = 0; j < i; j++)
-      roulette_wheel.push_back(eval_list[i].chromo_number);
-  }
-
-  // for (int i = 0; i < roulette_wheel.size(); i++) {
-  //   cout << roulette_wheel[i] << " ";
-  // }
-
-  // cout << endl;
-
-  std::uniform_int_distribution<int> select_parent(0, roulette_wheel.size()-1);
-  vector<int> two_parents;
-
-  two_parents.push_back(roulette_wheel[select_parent(rng)]);
-  two_parents.push_back(roulette_wheel[select_parent(rng)]);
-
-  // cout << two_parents[0] << " and " << two_parents[1] << endl;
-
-  return two_parents;
-}
-
-// std::cout << "Player 0 (Green)  Won " << wins[0] << " games" << std::endl;
-// std::cout << "Player 1 (Yellow) Won " << wins[1] << " games" << std::endl;
-// std::cout << "Player 2 (Blue)   Won " << wins[2] << " games" << std::endl;
-// std::cout << "Player 3 (Red)    Won " << wins[3] << " games" << std::endl;

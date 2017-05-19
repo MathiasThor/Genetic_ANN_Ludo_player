@@ -30,7 +30,6 @@ class neural_network {
 private:
     // CONSTANTS
     QApplication* a;
-    // FUNCTIONS
 
 public:
     neural_network( QApplication* app );

@@ -6,7 +6,6 @@ neural_network::neural_network( QApplication* app ){
 }
 
 void neural_network::learn(){
-  //QApplication a(argc, argv);
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here
@@ -55,7 +54,6 @@ void neural_network::learn(){
 }
 
 void neural_network::play(){
-  //QApplication a(argc, argv);
   qRegisterMetaType<positions_and_dice>();
 
   //instanciate the players here

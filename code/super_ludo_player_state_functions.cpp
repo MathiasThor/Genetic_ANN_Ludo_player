@@ -2,7 +2,12 @@
 
 using namespace std;
 
-// OK
+//
+//
+//  THIS FILES CONTAINS ALL THE STATE FUNCTION!
+//
+//
+
 bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL OK
   if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) && pos+new_dice_roll > 50)
     return false;
@@ -39,56 +44,46 @@ bool super_ludo_player::can_kill(int pos, int new_dice_roll){ // OK + STAR KILL 
   }
 
   if (num_of_players == 1 && star_jump != 0) {
-    //debug_stop("KILL PLAYER", pos, true);
     return true;
   }
   return false;
 }
 
-// OK
 bool super_ludo_player::can_get_home(int pos, int new_dice_roll){
   if ( pos + new_dice_roll == 56 || pos + new_dice_roll == 50 ) {
-    //debug_stop("GET HOME", pos, false);
     return true;
   }
   return false;
 }
 
-// OK
 bool super_ludo_player::can_enter_safe_zone(int pos, int new_dice_roll){
   if ( pos + new_dice_roll >= 51 && pos < 51) {
-    //debug_stop("ENTER SAFE", pos, false);
     return true;
   }
   return false;
 }
 
-// OK
 bool super_ludo_player::can_move(int pos, int new_dice_roll){
   if ((pos == -1 && new_dice_roll != 6) || pos == 99)
     return false;
   return true;
 }
 
-// OK
 bool super_ludo_player::can_get_on_star(int pos, int new_dice_roll){ // OK
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos))
     if(pos+new_dice_roll == 5  || pos+new_dice_roll == 18 || pos+new_dice_roll == 31 ||
        pos+new_dice_roll == 44 || pos+new_dice_roll == 11 || pos+new_dice_roll == 24 ||
        pos+new_dice_roll == 37 || pos+new_dice_roll == 50 ) {
-       //debug_stop("GET ON STAR", pos, false);
        return true;
     }
   return false;
 }
 
-// OK
 bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
   int stack_player_count = 0;
 
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
     if( (pos+new_dice_roll - 8) % 13 == 0 ) {
-      //debug_stop("GET ON GLOBE", pos, true);
       return true;
     } else {
       if (can_get_on_star(pos,new_dice_roll)) {
@@ -112,10 +107,8 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
         }
       }
       if (new_dice_roll != 0 && stack_player_count >= 1) {
-        //debug_stop("2 man stack(1)", pos, true);
         return true;
       } else if (new_dice_roll == 0 && stack_player_count >= 2) {
-        //debug_stop("2 man stack(2)", pos, false);
         return true;
       }
     }
@@ -123,7 +116,6 @@ bool super_ludo_player::can_get_on_globe(int pos, int new_dice_roll){
   return false;
 }
 
-// OK
 bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos)){
     if (can_get_on_star(pos,new_dice_roll)) {
@@ -171,16 +163,13 @@ bool super_ludo_player::can_enter_non_danger_zone(int pos, int new_dice_roll){
   return false;
 }
 
-// OK
 bool super_ludo_player::currently_home(int pos){
   if ( pos == 99 ) {
-    //debug_stop("HOME", pos, false);
     return true;
   }
   return false;
 }
 
-// OK
 bool super_ludo_player::currently_in_non_danger_zone(int pos){
   if (can_enter_non_danger_zone(pos,0)) {
     return true;
@@ -188,16 +177,13 @@ bool super_ludo_player::currently_in_non_danger_zone(int pos){
   return false;
 }
 
-// OK
 bool super_ludo_player::currently_in_safe_zone(int pos){
   if ( pos >= 51 && pos != 99 ) {
-    //debug_stop("Is in safe", pos, true);
     return true;
   }
   return false;
 }
 
-// OK
 bool super_ludo_player::currently_on_globe(int pos){
   if ( can_get_on_globe(pos,0) || pos == 0) {
     return true;
@@ -205,7 +191,6 @@ bool super_ludo_player::currently_on_globe(int pos){
   return false;
 }
 
-// OK
 bool super_ludo_player::currently_on_star(int pos){
   if ( can_get_on_star(pos,0) || pos == 0) {
     return true;
@@ -213,7 +198,6 @@ bool super_ludo_player::currently_on_star(int pos){
   return false;
 }
 
-// OK
 bool super_ludo_player::can_get_on_enemy_start(int pos, int new_dice_roll){
   if ( pos != -1 && pos != 99 && !currently_in_safe_zone(pos) && pos+new_dice_roll < 51){
     if ((pos+new_dice_roll) % 13 == 0) {
@@ -223,7 +207,6 @@ bool super_ludo_player::can_get_on_enemy_start(int pos, int new_dice_roll){
   return false;
 }
 
-// OK
 bool super_ludo_player::currently_on_enemy_start(int pos){
   if ( can_get_on_enemy_start(pos,0) && pos != 0) {
     return true;
@@ -231,7 +214,6 @@ bool super_ludo_player::currently_on_enemy_start(int pos){
   return false;
 }
 
-// OK
 bool super_ludo_player::can_get_killed(int pos, int new_dice_roll){
   if (pos == -1 || pos == 99 || currently_in_safe_zone(pos) || pos+new_dice_roll > 50)
     return false;
@@ -242,7 +224,6 @@ bool super_ludo_player::can_get_killed(int pos, int new_dice_roll){
   return false;
 }
 
-//OK
 bool super_ludo_player::can_get_out_of_start(int pos, int new_dice_roll){
   if (pos == -1 && new_dice_roll == 6) {
     return true;
@@ -250,7 +231,6 @@ bool super_ludo_player::can_get_out_of_start(int pos, int new_dice_roll){
   return false;
 }
 
-// OK
 bool super_ludo_player::enemy_globe(int pos){
   if (pos == -1 || pos == 99 || currently_in_safe_zone(pos))
     return false;

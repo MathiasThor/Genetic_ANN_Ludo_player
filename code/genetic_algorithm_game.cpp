@@ -13,17 +13,7 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
   game g;
   g.setGameDelay(0); //if you want to see the game, set a delay
 
-  /* Add a GUI <-- remove the '/' to uncomment block
-  Dialog w;
-  QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
-  QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
-  QObject::connect(&g,SIGNAL(set_dice_result(int)),             &w,SLOT(get_dice_result(int)));
-  QObject::connect(&g,SIGNAL(declare_winner(int)),              &w,SLOT(get_winner()));
-  QObject::connect(&g,SIGNAL(close()),&a,SLOT(quit()));
-  w.show();
-  /*/ //Or don't add the GUI
   QObject::connect(&g,SIGNAL(close()),a,SLOT(quit()));
-  //*/
 
   //set up for each player
   QObject::connect(&g,        SIGNAL(player1_start(positions_and_dice)),&p1_green,   SLOT(start_turn(positions_and_dice)));
@@ -46,9 +36,6 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
   QObject::connect(&g,       SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
   QObject::connect(&p4_red, SIGNAL(turn_complete(bool)),              &g,      SLOT(turnComplete(bool)));
 
-  //g.start();
-  //a->exec();
-
   for(int i = 0; i < PLAY_TIMES_EVAL; ++i){
       g.start();
       while (a->closingDown()){}
@@ -60,10 +47,6 @@ int genetic_algorithm::play_game(chromosome player_chromo, float *fitness){
       if(g.wait()){}
   }
 
-
-  //std::cout << "Wins " << g.wins[0] << " " << g.wins[1] << " "<< g.wins[2] << " " << g.wins[3] << endl;
-
-  //std::vector<int> v { g.wins[0], g.wins[1], g.wins[2], g.wins[3] };
   return g.wins[0];
 }
 
@@ -102,9 +85,6 @@ std::vector<int> genetic_algorithm::play_turnament(chromosome player1_chromo, ch
   QObject::connect(g, SIGNAL(player4_end(std::vector<int>)),    &p4_red,SLOT(post_game_analysis(std::vector<int>)));
   QObject::connect(&p4_red,SIGNAL(turn_complete(bool)),              g, SLOT(turnComplete(bool)));
 
-  // g->start();
-  // a->exec();
-
   for(int i = 0; i < PLAY_TIMES_TURNAMENT; ++i){
       g->start();
       a->exec();
@@ -113,6 +93,7 @@ std::vector<int> genetic_algorithm::play_turnament(chromosome player1_chromo, ch
       if(g->wait()){}
   }
 
+  // Return Best Player from tournament
   std::vector<int> v { g->wins[0], g->wins[1], g->wins[2], g->wins[3] };
 
   int largest = 0;

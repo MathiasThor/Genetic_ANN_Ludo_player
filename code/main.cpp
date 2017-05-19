@@ -3,26 +3,13 @@
 int main(int argc, char *argv[]){
     QApplication* app = new QApplication( argc, argv );
 
-    // genetic_algorithm GA(app, "generation_225.bin");
-    // genetic_algorithm GA(app);
-    neural_network NN(app);
+    // genetic_algorithm GA(app, "generation_225.bin"); // Train from binary save
+    // genetic_algorithm GA(app);                       // Train GA from start
+    neural_network NN(app);                             // Make ANN player
     for (int i = 0; i < 10; i++)
-      NN.star_gamer();
+      NN.star_gamer();                                  // Play with .NET vs. other players
     // for (int i = 0; i < 5; i++)
-    //   NN.play();
-    // NN.learn();
+    //   NN.play();                                     // Play with ANN vs. SemiSmart
+    // NN.learn();                                      // Make training data for ANN player
     return 0;
 }
-
-
-// Play:
-// 2540
-// 2612
-// 2517
-// 2331
-
-// Star_gamer:
-// 3108
-// 2406
-// 2261
-// 2225

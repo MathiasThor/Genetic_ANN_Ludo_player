@@ -94,25 +94,18 @@ int super_ludo_player::make_decision(){
     if ( !can_move(pos_start_of_turn[sorted_indexx[1]], dice_roll) ) {
       if ( !can_move(pos_start_of_turn[sorted_indexx[2]], dice_roll) ) {
         if ( !can_move(pos_start_of_turn[sorted_indexx[3]], dice_roll) ) {
-          //std::cout << "E";
-          //std::cin.ignore(std::cin.rdbuf()->in_avail()+1);
         } else {
-          //cout << "- ";
           return sorted_indexx[3];
         }
       } else {
-        //cout << "+ ";
         return sorted_indexx[2];
       }
     } else {
-      //cout << "* ";
       return sorted_indexx[1];
     }
   } else {
     return sorted_indexx[0];
   }
-
-  //debug_stop("ERROR", 99, false);
   return 1;
 }
 
@@ -143,5 +136,3 @@ void super_ludo_player::post_game_analysis(std::vector<int> relative_pos){
 
     emit turn_complete(game_complete);
 }
-
-// fitness function: f = WINNER*? + players_home*? + leftover_distance*?

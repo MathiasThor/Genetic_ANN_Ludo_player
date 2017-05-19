@@ -2,6 +2,7 @@
 
 using namespace std;
 
+// Function for making training data
 int super_ludo_player::record_my_games(){
   cout << "\n---\n\n";
 
