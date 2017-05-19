@@ -1,4 +1,4 @@
-% Paired t-test
+ % Paired t-test
 % sigma unknown or small sample size n < 30
 
 % The function ttest2 tests if two independent samples come from normal 
@@ -10,16 +10,16 @@
 close; clc; clear all:
 
 % ANN vs. SS
-%data_own   = [];
-%data_other = [];
+% data_own   = [2330 2359 2375 2373 2409 2400 2396 2388 2285 2384];
+% data_other = [2556 2547 2541 2542 2530 2533 2534 2537 2571 2538];
 
 % SS
-%data_own   = [5581 5599 5499 5542 5479 5549 5451 5486 5484 5517];
-%data_other = [1473 1473 1473 1473 1507 1483 1516 1504 1505 1494];
+% data_own   = [5673 5998 5973 5978 6040 5955 6088 6018 5886 6001];
+% data_other = [1442 1334 1342 1340 1320 1348 1304 1327 1371 1333];
 
 % ANN
-data_own   = [4594 4642 4680 4612 4687 4665 4550 4641 4661 4617];
-data_other = [1802 1786 1773 1796 1771 1778 1816 1786 1779 1794];
+data_own   = [5011 4950 5086 4979 5020 5020 4988 5052 4971 5094];
+data_other = [1663 1683 1638 1673 1660 1660 1670 1649 1676 1635];
 
 % Q
 %data_own   = [];
@@ -31,14 +31,17 @@ var_own  = var(data_own);
 mean_other = mean(data_other);
 var_other  = var(data_other);
 
+fprintf('Mean: %.2f', mean_own/100)
+
 figure(1)
 subplot(1,2,1)
 normplot(data_own)
 subplot(1,2,2)
 normplot(data_other)
 
-[h,p] = ttest2(data_own,data_other, 'Tail', 'right');
+[h,p,ci,stat] = ttest2(data_own, data_other);
 fprintf('\nThe P value is: %d\n', p)
 fprintf('Rejected (1) or accepted (0) at 5%% signifance level: %i\n\n', h)
+stat
 
 

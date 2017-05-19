@@ -4,11 +4,12 @@ int main(int argc, char *argv[]){
     QApplication* app = new QApplication( argc, argv );
 
     // genetic_algorithm GA(app, "generation_225.bin");
-    genetic_algorithm GA(app);
-    // neural_network NN(app);
-    // for (int i = 0; i < 10; i++)
-    //   NN.star_gamer();
-    // NN.play();
+    // genetic_algorithm GA(app);
+    neural_network NN(app);
+    for (int i = 0; i < 10; i++)
+      NN.star_gamer();
+    // for (int i = 0; i < 5; i++)
+    //   NN.play();
     // NN.learn();
     return 0;
 }

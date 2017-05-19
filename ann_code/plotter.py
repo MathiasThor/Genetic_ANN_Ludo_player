@@ -11,7 +11,7 @@ epokes =  []
 for i in xrange(len(error)):
     epokes.append(i);
 
-plt.axis([0, 50, 0, 0.14])
+# plt.axis([0, 3000, 0, 0.3])
 plt.rcParams.update({'font.size': 24})
 plt.gcf().subplots_adjust(bottom=0.13)
 plt.gcf().subplots_adjust(left=0.15)

@@ -14,8 +14,8 @@ gen =  []
 for i in xrange(len(l_fit)):
     gen.append(i);
 
-plt.axis([0, 1450, 9, 75])
-plt.rcParams.update({'font.size': 22})
+plt.axis([0, 1450, 9, 80])
+plt.rcParams.update({'font.size': 20})
 plt.gcf().subplots_adjust(bottom=0.12)
 plt.style.use('seaborn-bright') # seaborn-bright
 plt.plot(gen, l_fit, label="Largest fitness", linewidth=3)
