@@ -120,7 +120,7 @@ void neural_network::star_gamer(){
   // super_ludo_player p3_blue(false);
 
 
-  super_ludo_player p1_green(false, "./../../data/current_best_player.net");
+  super_ludo_player p1_green(false, "./../../GA-Player.net");
 
   game g;
   g.setGameDelay(0);
