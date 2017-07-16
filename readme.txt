@@ -18,4 +18,4 @@ What are the different classes in the code directory?:
   neural_network*:      This is the code used for the ANN and for testing.
 ====*====
 
-If you have questions or problems with the code fell free to contact me.
+If you have questions or problems with the code feel free to contact me.
