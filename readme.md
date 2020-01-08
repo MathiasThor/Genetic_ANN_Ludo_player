@@ -10,10 +10,10 @@ For creating the GA-player, one would have to use the genetic_algorithm
 class in the code directory.
 
 What are the different classes in the code directory?:
-  ludo_player*:         This is the Semi-Smart player
-  ludo_player_random*:  This is the Random player
-  super_ludo_player*:   This is the ANN used for both the GA- and ANN-player
-  genetic_algorithm*:   This is the code used for the GA.
-  neural_network*:      This is the code used for the ANN and for testing.
+  * ludo_player*:         This is the Semi-Smart player 
+  * ludo_player_random*:  This is the Random player 
+  * super_ludo_player*:   This is the ANN used for both the GA- and ANN-player 
+  * genetic_algorithm*:   This is the code used for the GA. 
+  * neural_network*:      This is the code used for the ANN and for testing. 
 
 If you have questions or problems with the code feel free to contact me.
