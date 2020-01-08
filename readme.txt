@@ -2,6 +2,8 @@
 AI2 LUDO HAND-IN By Mathias Thor
 =================================
 
+Start by looking at the project report [here.](https://github.com/MathiasThor/Genetic_ANN_Ludo_player/blob/master/AI2_LUDO.pdf)
+
 The code is not fully commented as the function names should be self-explanatory.
 Each player has its own class.
 For creating the ANN-player, one would have to use the main.cpp in the
