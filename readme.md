@@ -1,4 +1,4 @@
-# AI2 LUDO HAND-IN By Mathias Thor
+# Genetic Algorithm for LUDO
 
 Start by looking at the project report [here.](https://github.com/MathiasThor/Genetic_ANN_Ludo_player/blob/master/AI2_LUDO.pdf)
 
